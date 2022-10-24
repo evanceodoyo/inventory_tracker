@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load filters %}
+{% load humanize %}
+{% block content %}    
+<body>
+    {% include '_account-nav.html' %}
+    <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-responsive-width="992px" data-has-scrolling-region>
+        <div class="mdk-drawer-layout__content">
+            <!-- header-layout -->
+            <div
+                class="mdk-header-layout js-mdk-header-layout  mdk-header--fixed  mdk-header-layout__content--scrollable">
+                <!-- header -->
+
+                <!-- content -->
+                <div class="mdk-header-layout__content top-navbar mdk-header-layout__content--scrollable h-100">
+                    <!-- main content -->
+                    <div class="container-fluid">
+                        
+                        <div class="row">
+                            <div class="col-lg-5">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title text-center">
+                                            Shipping Details
+                                        </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <form action="{% url 'checkout' %}" method="post">
+                                                {% csrf_token %}
+                                                <div class="row">
+                                                    <div class="form-group col-md-6">
+                                                        <label for="county">County</label>
+                                                        <select name="county" class="form-control" required>
+                                                            <option value='Nairobi'>Nairobi</option>
+                                                            <option value='Baringo'>Baringo</option>
+                                                            <option value='Bomet'>Bomet</option>
+                                                            <option value='Bungoma'>Bungoma</option>
+                                                            <option value='Busia'>Busia</option>
+                                                            <option value='Elgeyo-Marakwet'>Elgeyo-Marakwet</option>
+                                                            <option value='Embu'>Embu</option>
+                                                            <option value='Garissa'>Garissa</option>
+                                                            <option value='Homa Bay'>Homa Bay</option>
+                                                            <option value='Isiolo'>Isiolo</option>
+                                                            <option value='Kajiado'>Kajiado</option>
+                                                            <option value='Kakamega'>Kakamega</option>
+                                                            <option value='Kericho'>Kericho</option>
+                                                            <option value='Kiambu'>Kiambu</option>
+                                                            <option value='Kilifi'>Kilifi</option>
+                                                            <option value='Kirinyaga'>Kirinyaga</option>
+                                                            <option value='Kisii'>Kisii</option>
+                                                            <option value='Kisumu'>Kisumu</option>
+                                                            <option value='Kitui'>Kitui</option>
+                                                            <option value='Kwale'>Kwale</option>
+                                                            <option value='Laikipia'>Laikipia</option>
+                                                            <option value='Lamu'>Lamu</option>
+                                                            <option value='Machakos'>Machakos</option>
+                                                            <option value='Makueni'>Makueni</option>
+                                                            <option value='Mandera'>Mandera</option>
+                                                            <option value='Marsabit'>Marsabit</option>
+                                                            <option value='Meru'>Meru</option>
+                                                            <option value='Migori'>Migori</option>
+                                                            <option value='Mombasa'>Mombasa</option>
+                                                            <option value='Murang'>Murang'a</option>
+                                                            <option value='Nakuru'>Nakuru</option>
+                                                            <option value='Nandi'>Nandi</option>
+                                                            <option value='Narok'>Narok</option>
+                                                            <option value='Nyamira'>Nyamira</option>
+                                                            <option value='Nyandarua'>Nyandarua</option>
+                                                            <option value='Nyeri'>Nyeri</option>
+                                                            <option value='Samburu'>Samburu</option>
+                                                            <option value='Siaya'>Siaya</option>
+                                                            <option value='Taita-Taveta'>Taita-Taveta</option>
+                                                            <option value='Tana River'>Tana River</option>
+                                                            <option value='Tharaka-Nithi'>Tharaka-Nithi</option>
+                                                            <option value='Trans Nzoia'>Trans Nzoia</option>
+                                                            <option value='Turkana'>Turkana</option>
+                                                            <option value='Uasin Gishu'>Uasin Gishu</option>
+                                                            <option value='Vihiga'>Vihiga</option>
+                                                            <option value='West Pokot'>West Pokot</option>
+                                                            <option value='wajir'>wajir</option>
+                                                            <option value='{{ shipping_address.county }}' selected>{{ shipping_address.county }}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label for="street">Street Address</label>
+                                                        <input type="text" name="street" class="form-control" value="{{ shipping_address.street }}" placeholder="e.g 85th Street" required>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label for="apartment">Apt/Suite/Unit</label>
+                                                    <input type="text" value="{{ shipping_address.apartment }}" name="apartment" class="form-control" required>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label for="phone">Phone</label>
+                                                    <input type="phone" name="phone" value="{{ shipping_address.phone }}" class="form-control" placeholder="07XXXXXXXX" required>
+                                                </div>
+                                                <div class="">
+                                                    <button type="submit" class="btn btn-primary">Save and Continue</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title text-center">
+                                            Payment Details
+                                        </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <form action="{% url 'payment' %}" method="post">
+                                                {% csrf_token %}
+                                                <div class="form-group col-md-6">
+                                                    <label for="payment-method">Payment Method</label>
+                                                    <select name="payment-method" class="form-control" required>
+                                                        <option value="mpesa">M-PESA</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label for="phone">Phone</label>
+                                                    <input type="phone" name="phone" class="form-control" placeholder="07XXXXXXXX" required>
+                                                </div>
+                                                
+                                                {% if not request.user.shipping_address %}
+                                                <div class="">
+                                                    <button type="submit" class="btn btn-primary" disabled>Please Provide and Save Your Shipping Address First</button>
+                                                </div>
+                                                {% else %}
+                                                <div class="">
+                                                    <button type="submit" class="btn btn-primary">Confirm Order</button>
+                                                </div>
+                                                {% endif %}
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-7">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title text-center">
+                                            Your Order
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table m-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Item</th>
+                                                        <th>Price</th>
+                                                        <th>Quantity</th>
+                                                        <th>Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                    {% for item in order_items %}
+                                                    <tr>
+                                                        <td class="align-middle">
+                                                            <div class="media align-items-center">
+                                                                <img src="{{ item.image.url }}" alt="cart item image" class="m-2 img-thumbnail d-none d-sm-block" width="100" />
+                                                                <div class="media-body">
+                                                                    <p class="h6 mb-1">
+                                                                        {{ item.name|truncatewords:"5"}}
+                                                                    </p>
+                                                                    <span class="text-muted">
+                                                                        #{{ item.sku|upper }}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="align-middle">Ksh {{ item.price|floatformat|intcomma }}</td>
+                                                        <td class="align-middle">
+                                                            {{ item|quantity_in_cart:request.session.cart }}
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            Ksh {{ item|total_price:request.session.cart|floatformat:"0"|intcomma }}
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                            <p class="lead text-right text-">
+                                                <span class="mr-0 ">Total:</span>
+                                                <strong>
+                                                    Ksh {{ order_items|grand_product_total:request.session.cart|floatformat:"0"|intcomma }}</strong>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- // END drawer-layout__content -->       
+    </div>
+    <!-- // END drawer-layout -->
+</body>
+{% endblock content %}

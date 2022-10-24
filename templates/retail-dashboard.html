@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% load filters %}
+{% load mathfilters %}
+{% block content %}
+<body>
+    <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-responsive-width="992px"
+        data-has-scrolling-region>
+
+        <div class="mdk-drawer-layout__content">
+            <!-- header-layout -->
+            <div
+                class="mdk-header-layout js-mdk-header-layout  mdk-header--fixed  mdk-header-layout__content--scrollable">
+                <!-- header -->
+                <div class="mdk-header js-mdk-header bg-primary" data-fixed>
+                    <div class="mdk-header__content">
+                        {% include '_account-nav.html' %}
+                        <nav class="navbar navbar-expand-md bg-primary navbar-dark d-flex-none">
+                            <button class="btn btn-link text-white pl-0" type="button" data-toggle="sidebar">
+                                <i class="material-icons align-middle md-36">short_text</i>
+                            </button>
+                            <div class="page-title m-0">Retail</div>
+
+                            <div class="collapse navbar-collapse" id="mainNavbar">
+
+
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- content -->
+                <div class="mdk-header-layout__content top-navbar mdk-header-layout__content--scrollable h-100">
+                    <!-- main content -->
+                    <div class="container mt-0 pb-3">
+                        <div class="row align-items-center mb-3">
+                            <div class="col-md-6">
+                                <h1 class="h2 mb-0">Retail Dashboard</h1>
+                                <ol class="breadcrumb p-0">
+                                    <li>
+                                        <a href="#">Dashboards</a>
+                                    </li>
+                                    <li class="text-muted">
+                                        Retail
+                                    </li>
+                                </ol>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-md-flex new-order">
+                                    <select class="custom-select mr-2">
+                                        <option selected>Nairobi</option>
+                                        <option value="1">Mombasa</option>
+                                        <option value="2">Nakuru</option>
+                                    </select>
+                                    <div class="input-group mr-2">
+                                        <div class="input-group-prepend prev-date">
+                                            <span class="input-group-text">
+                                                <i class="material-icons md-18 align-middle">chevron_left</i>
+                                            </span>
+                                        </div>
+                                        <input type="text" class="datepicker-retail form-control">
+                                        <div class="input-group-append next-date">
+                                            <span class="input-group-text">
+                                                <i class="material-icons md-18 align-middle">chevron_right</i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <a href="purchase-order.html" class="btn btn btn-success">
+                                        <i class="material-icons md-18 align-middle">shopping_cart</i>
+                                        <span class="align-middle">New Order</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header d-flex align-items-center justify-content-between">
+                                        <h4 class="card-title">Revenue</h4>
+                                        <div>
+                                            <a href="#" class="btn btn-sm btn-white mr-1">
+                                                <i class="material-icons md-18 align-middle">import_export</i>
+                                                <small class="align-middle text-uppercase">Export</small>
+                                            </a>
+                                            <a href="#" class="btn btn-sm btn-white">
+                                                <i class="material-icons md-18 align-middle">print</i>
+                                                <small class="align-middle text-uppercase">Print</small>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="media align-items-center mb-3">
+                                            <i class="material-icons md-36 text-success mr-2">keyboard_arrow_up</i>
+                                            <div class="media-body">
+                                                <div class="d-flex align-items-center">
+                                                    <span>&dollar;</span>
+                                                    <h4 class="mb-0">108,350.00</h4>
+                                                </div>
+                                                <div class="text-success">
+                                                    +8.3% since last month
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="w-100">
+                                            <canvas id="retail-revenue-chart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header d-flex align-items-center justify-content-between">
+                                        <h4 class="card-title">Sales</h4>
+                                        <div>
+                                            <a href="#" class="btn btn-sm btn-white mr-1">
+                                                <i class="material-icons md-18 align-middle">import_export</i>
+                                                <small class="align-middle text-uppercase">Export</small>
+                                            </a>
+                                            <a href="#" class="btn btn-sm btn-white">
+                                                <i class="material-icons md-18 align-middle">print</i>
+                                                <small class="align-middle text-uppercase">Print</small>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="media align-items-center mb-3">
+                                            <i class="material-icons md-36 text-danger mr-2">keyboard_arrow_down</i>
+                                            <div class="media-body">
+                                                <div class="d-flex align-items-center">
+                                                    <span>&dollar;</span>
+                                                    <h4 class="mb-0">29,165.50</h4>
+                                                </div>
+                                                <div class="text-danger">
+                                                    -5.5% since last week
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="w-100">
+                                            <canvas id="retail-sales-chart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="table-responsive">
+                                <table class="table m-0">
+                                    <thead>
+                                        <tr class="bg-fade">
+                                            <th style="width: 80px;">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input check-sales"
+                                                        id="saleCheckAll">
+                                                    <label class="custom-control-label align-middle"
+                                                        for="saleCheckAll"></label>
+                                                </div>
+                                            </th>
+                                            <th>Product</th>
+                                            <th>In Stock</th>
+                                            <th>Sold</th>
+                                            <th>Revenue(Ksh)</th>
+                                            <th>Discount</th>
+                                            <th style="width: 150px;">Status</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                        {% for product in products %}
+                                        <tr>
+                                            <td class="align-middle">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input sale"
+                                                        id="saleCheck1">
+                                                    <label class="custom-control-label align-middle"
+                                                        for="saleCheck1"></label>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle">
+                                                <div class="media align-items-center">
+                                                    <a href="{{ product.get_absolute_url }}">
+                                                        <img src="{{ product.image.url }}" alt="product image" width="40" class="rounded-circle mr-2">
+                                                    </a>
+                                                    <div class="media-body lh-1">
+                                                        <a href="{{ product.get_absolute_url }}">{{ product.name|truncatewords:"3"}}</a>
+                                                        <!-- <div class="text-muted"></div> -->
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle">{{ product.quantity }}</td>
+                                            <td class="align-middle">{{ product|quantity_sold }}</td>
+                                            <td class="align-middle">{{ product|quantity_sold|mul:product.price|floatformat:"0"|intcomma }}</td>
+                                            <td class="align-middle">
+                                                sign
+                                            </td>
+                                            <td>
+                                                
+                                                {% with pq=product.quantity prl=product.reorder_level  %}
+                                                    {% if pq > prl|add:"30" %}
+                                                    <div class="badge badge-success">STOCKED</div>
+                                                    {% elif pq > prl %}
+                                                    <div class="badge badge-primary">CONSIDER RESTOCKING</div>
+                                                    {% elif pq > 0 and pq <= prl %}
+                                                    <div class="badge badge-warning">RESTOCK NOW</div>
+                                                    {% else %}
+                                                    <div class="badge badge-danger">OUT OF STOCK</div>
+                                                    {% endif %}
+                                                {% endwith %}
+                                            </td>
+                                            <td>
+                                                <div class="dropdown show">
+                                                    <a class="btn btn-white btn-sm" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+                                                        aria-expanded="false">
+                                                        <i class="material-icons md-18 align-middle">more_vert</i>
+                                                    </a>
+                                            
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="#">
+                                                            <i class="material-icons md-14 align-middle">edit</i>
+                                                            <span class="align-middle">Edit</span>
+                                                        </a>
+                                                        
+                                                        <a class="dropdown-item" href="#">
+                                                            <i class="material-icons md-14 align-middle">shopping_cart</i>
+                                                            <span class="align-middle">Add to cart</span>
+                                                        </a>
+
+                                                        <div class="dropdown-divider"></div>
+                                                        <a class="dropdown-item text-danger" href="#">
+                                                            <i class="material-icons md-14 align-middle">delete</i>
+                                                            <span class="align-middle">Delete</span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            {% if products.has_other_pages %}
+                            <div class="card-body bg-fade">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <nav aria-label="Page navigation" class="mr-3">
+                                        <ul class="pagination m-0">
+                                            
+                                            {% if products.has_previous %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                    <span class="sr-only">{{ products.previous_page_number }}</span>
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                            
+                                            {% for p in products.paginator.page_range %}
+                                                
+                                                {% if p == products.number %}
+                                                <li class="page-item active"><a class="page-link" href="#">{{p}}</a></li>
+                                                {% else %}
+                                                <li class="page-item"><a class="page-link" href="?page={{ p }}">{{ p }}</a></li>
+                                                {% endif %}
+                                            {% endfor %}
+                                            
+                                            {% if products.has_next %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ products.next_page_number }}" aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                    <span class="sr-only">Next</span>
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                        </ul>
+                                    </nav>
+                                    <div class="text-muted">1-10 of 200 items</div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- // END drawer-layout__content -->
+    </div>
+    <!-- // END drawer-layout -->
+</body>
+{% endblock content %}

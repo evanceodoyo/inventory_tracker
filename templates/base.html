@@ -1,0 +1,223 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>
+        {% block title %}{% if page_title %} {{ page_title }} {% endif %} {% endblock title %} | {{ site_name }}
+    </title>
+
+
+    <link type="text/css" href="{% static '/css/vendor-morris.css' %}" rel="stylesheet">
+    <link type="text/css" href="{% static '/css/vendor-bootstrap-datepicker.css' %}" rel="stylesheet">
+
+    <!-- App CSS -->
+    <link type="text/css" href="{% static '/css/app.css' %}" rel="stylesheet">
+    <link type="text/css" href="{% static '/css/app.rtl.css' %}" rel="stylesheet">
+
+    <!-- Simplebar -->
+    <link type="text/css" href="{% static '/vendor/simplebar.css' %}" rel="stylesheet">
+
+</head>
+
+{% if messages %}
+<div class="card-body">
+  {% for message in messages %}
+    {% if  message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+    <div class="alert alert-success alert-dismissable fade show text-center" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% elif  message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+    <div class="alert alert-danger alert-dismissable fade show text-center" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% elif  message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+    <div class="alert alert-primary alert-dismissable fade show text-center" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endif %}
+  {% endfor %}
+</div>
+{% endif %}
+  
+{% block content %}
+    
+    {% block account %}
+        
+    {% endblock account %}
+        
+{% endblock content %}
+
+<!-- jQuery -->
+<script src="{% static '/vendor/jquery.min.js' %}"></script>
+
+<!-- Bootstrap -->
+<script src="{% static '/vendor/popper.js' %}"></script>
+<script src="{% static '/vendor/bootstrap.min.js' %}"></script>
+
+
+<!-- Simplebar -->
+<!-- Used for adding a custom scrollbar to the drawer -->
+<script src="{% static '/vendor/simplebar.js' %}"></script>
+
+
+<!-- Vendor -->
+<script src="{% static '/vendor/Chart.min.js' %}"></script>
+<script src="{% static '/vendor/moment.min.js' %}"></script>
+
+<!-- APP -->
+<script src="assets/js/color_variables.js"></script>
+<!-- APP -->
+<script src="{% static '/js/color_variables.js' %}"></script>
+<script src="{% static '/js/app.js' %}"></script>
+
+
+<script src="{% static '/vendor/dom-factory.js' %}"></script>
+<!-- DOM Factory -->
+<script src="{% static '/vendor/material-design-kit.js' %}"></script>
+<!-- MDK -->
+<script src="{% static '/vendor/morris.min.js' %}"></script>
+<script src="{% static '/vendor/raphael.min.js' %}"></script>
+<script src="{% static '/vendor/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static '/js/datepicker.js' %}"></script>
+<script src="{% static '/vendor/owl.carousel.min.js' %}"></script>
+<script src="{% static '/js/charts_retail.js' %}"></script>
+
+
+
+<script>
+    (function() {
+        'use strict';
+        // Self Initialize DOM Factory Components
+        domFactory.handler.autoInit()
+        
+        
+        // Connect button(s) to drawer(s)
+        var sidebarToggle = document.querySelectorAll('[data-toggle="sidebar"]')
+
+        sidebarToggle.forEach(function(toggle) {
+            toggle.addEventListener('click', function(e) {
+                var selector = e.currentTarget.getAttribute('data-target') || '#default-drawer'
+                var drawer = document.querySelector(selector)
+                if (drawer) {
+                    if (selector == '#default-drawer') {
+                        $('.container-fluid').toggleClass('container--max');
+                    }
+                    drawer.mdkDrawer.toggle();
+                }
+            })
+        })
+    })()
+
+    $(function() {
+        window.morrisDashboardChart = new Morris.Area({
+            element: 'morris-area-chart',
+            data: [{
+                    year: '2017-01',
+                    a: 6352.27
+                },
+                {
+                    year: '2017-02',
+                    a: 4309.98
+                },
+                {
+                    year: '2017-03',
+                    a: 1465.98
+                },
+                {
+                    year: '2017-04',
+                    a: 1298.25
+                },
+                {
+                    year: '2017-05',
+                    a: 3209
+                },
+                {
+                    year: '2017-06',
+                    a: 2083
+                },
+                {
+                    year: '2017-07',
+                    a: 1285.23
+                },
+                {
+                    year: '2017-08',
+                    a: 1289
+                },
+                {
+                    year: '2017-09',
+                    a: 4430
+                },
+                {
+                    year: '2017-10',
+                    a: 8921.19
+                }
+            ],
+            xkey: 'year',
+            ykeys: ['a'],
+            labels: ['Earnings'],
+            lineColors: ['#fff'],
+            fillOpacity: '0.2',
+            gridEnabled: true,
+            gridTextColor: '#ffffff',
+            resize: true
+        });
+
+    });
+
+    $('.owl-carousel').owlCarousel({
+            loop: true,
+            autoplay: true,
+            responsive: {
+                0: {
+                    items: 1
+                },
+                480: {
+                    items: 2
+                },
+                768: {
+                    items: 5
+                }
+            }
+        });
+
+        $(".check-sales").click(function() {
+            $('.sale').not(this).prop('checked', this.checked);
+        });
+
+        $(".check-employees").click(function() {
+            $('.employee').not(this).prop('checked', this.checked);
+        });
+
+        // Get current date
+        let today = new Date();
+        let dd = today.getDate();
+        let mm = today.getMonth() + 1;
+        const yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd
+        }
+
+        if (mm < 10) {
+            mm = '0' + mm
+        }
+
+        today = mm + '/' + dd + '/' + yyyy;
+
+        $('.datepicker-retail').val(today)
+</script>
+</html>

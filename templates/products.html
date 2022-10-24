@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+
+<body>
+    <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-responsive-width="992px" data-has-scrolling-region>
+        <div class="mdk-drawer-layout__content">
+            <!-- header-layout -->
+            <div
+                class="mdk-header-layout js-mdk-header-layout mdk-header--fixed mdk-header-layout__content--scrollable">
+                <!-- header -->
+                <div class="mdk-header js-mdk-header bg-primary" data-fixed>
+                    <div class="mdk-header__content">
+                        <nav class="navbar navbar-expand-md navbar-dark bg-primary d-flex-none">
+                            <button class="btn btn-link text-white pl-0" type="button" data-toggle="sidebar">
+                                <i class="material-icons align-middle md-36">short_text</i>
+                            </button>
+                            <div class="page-title m-0">Product</div>
+
+                            <div class="collapse navbar-collapse" id="mainNavbar">
+                                {% include '_account-nav.html' %}
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+                <br>
+                <!-- main content -->
+                <div class="top-navbar">
+                    <div class="container container--wide">
+                        <div class="row real-estate-header">
+                            <div class="col-md-8">
+                                <div class="d-flex">
+                                    <span>Sort by:</span>
+                                    <select class="custom-select">
+                                        <option selected>Price</option>
+                                        <option value="1">Most sold</option>
+                                        <option value="2">Most recent</option>
+                                        <option value="3">Reviews</option>
+                                    </select>
+
+                                    <small class="text-muted">250 Results</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            {% for product in products %}
+                            <div class="col-md-4 col-lg-4">
+                                <div class="card card-property">
+                                    <a href="{{ product.get_absolute_url }}">
+                                        <img src="{{ product.image.url }}" class="card-img" alt="property" />
+                                    </a>
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <a href="{{ product.get_absolute_url }}"
+                                                class="h4 text-primary-dark mb-0">{{ product.name|truncatewords:"10" }}</a>
+
+                                        </div>
+                                        <ul class="list-unstyled m-0">
+                                            {% if product.old_price > product.price %}
+                                            <li class="d-flex mb-1">
+                                                <div class="lead text-primary mb-0">
+                                                    Ksh {{ product.price|floatformat:"0"|intcomma }}
+                                                </div>
+                                            </li>
+                                            <s>
+                                                <li class="d-flex mb-1">
+                                                    <div class="lead text-muted mb-0">
+                                                        Ksh {{ product.old_price|floatformat:"0"|intcomma }}
+                                                    </div>
+                                                </li>
+                                            </s>
+                                            {% else %}
+                                            <li class="d-flex mb-1">
+                                                <div class="lead text-primary mb-0">
+                                                    Ksh {{ product.price|floatformat:"0"|intcomma }}
+                                                </div>
+                                            </li>
+                                            {% endif %}
+                                            <li class="d-flex">
+                                                <!-- <div>
+                                                    <a href="shopping-cart.html" class="btn btn-success">
+                                                        <i class="material-icons md-18 align-middle">shopping_cart</i>
+                                                        <span class="align-middle">Add to cart</span>
+                                                    </a>
+                                                </div> -->
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                    </div>
+
+                    {% if products.has_other_pages %}
+                    <div class="card-footer">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination m-0">
+                                {% if products.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page" aria-label="Previous"> <span
+                                            aria-hidden="true">&laquo;</span>
+                                        <span class="sr-only">{{ products.previous_page_number }}</span></a>
+                                </li>
+                                {% endif %}
+
+                                {% for p in products.paginator.page_range %}
+                                {% if p == products.number %}
+                                <li class="page-item active"><a class="page-link">{{ p }}</a></li>
+                                {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ p }}">{{ p }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% if products.has_next %}
+                                <li class="page-item"><a class="page-link" href="?page={{ products.next_page_number }}"
+                                        aria-label="Next"> <span aria-hidden="true">&raquo;</span> <span
+                                            class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- // END drawer-layout__content -->
+
+        <!-- drawer -->
+        <div class="mdk-drawer js-mdk-drawer" id="default-drawer">
+            <div class="mdk-drawer__content">
+                <div class="mdk-drawer__inner" data-simplebar data-simplebar-force-enabled="true">
+                    <nav class="drawer drawer--dark">
+                        <div class="drawer-spacer">
+                            <div class="media align-items-center">
+                                <div class="media-body">
+                                    <a href="{% url 'home' %}" class="h5 m-0 text-link">Categories</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PAGES MENU -->
+                        <ul class="drawer-menu" id="pagesMenu" data-children=".drawer-submenu">
+                            <li class="drawer-menu-item drawer-submenu">
+                                {% for category in categories %}
+                            <li class="drawer-menu-item">
+                                <a href="/?category={{ category.slug }}">{{ category.title }}</a>
+                            </li>
+                            {% endfor %}
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <!-- // END drawer -->
+    </div>
+    <!-- // END drawer-layout -->
+</body>
+
+{% endblock content %}

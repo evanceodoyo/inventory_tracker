@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% load filters %}
+{% load mathfilters %}
+{% block content %}
+
+<body>
+    <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-responsive-width="992px" data-has-scrolling-region>
+        <div class="mdk-drawer-layout__content">
+            <!-- header-layout -->
+            <div
+                class="mdk-header-layout js-mdk-header-layout mdk-header--fixed mdk-header-layout__content--scrollable">
+                <!-- header -->
+                <div class="mdk-header js-mdk-header bg-primary" data-fixed>
+                    <div class="mdk-header__content">
+                        <nav class="navbar navbar-expand-md navbar-dark bg-primary d-flex-none">
+                            <button class="btn btn-link text-white pl-0" type="button" data-toggle="sidebar">
+                                <i class="material-icons align-middle md-36">short_text</i>
+                            </button>
+                            <div class="page-title m-0">Product</div>
+
+                            <div class="collapse navbar-collapse" id="mainNavbar">
+                                {% include '_account-nav.html' %}
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- content -->
+                <div class="mdk-header-layout__content top-navbar mdk-header-layout__content--scrollable h-100">
+                    <!-- main content -->
+                    <div class="container-fluid">
+                        <h1 class="h2 mb-0">{{ product.name }}</h1>
+                        <ol class="breadcrumb p-0 mb-3">
+                            <li>
+                                <a href="{% url 'home' %}">{{ site_name }}</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'home' %}">Products</a>
+                            </li>
+                            <li class="text-muted">{{ product.name }}</li>
+                        </ol>
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <img src="{{ product.image.url }}" alt="product image" class="img-fluid" />
+                                </div>
+                                <div class="col-lg-7 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="text-muted mb-3">
+                                            #{{ product.sku|upper }}
+                                        </div>
+                                        <p>{{ product.description }}</p>
+                                        <strong>Product Specifications:</strong>
+                                        <ul class="list-unstyled mb-3">
+                                            {% for specification in product.specifications.all|slice:"5" %}
+                                            <li>- {{ specification.title }}</li>
+                                            {% endfor %}
+                                        </ul>
+
+                                        {% if product.old_price > product.price %}
+                                        <h4 class="mb-1">
+                                            Ksh {{ product.price|floatformat:"0"|intcomma }}
+                                        </h4>
+                                        <h6 class="mb-1">
+                                            <s>
+                                                Ksh {{ product.old_price|floatformat:"0"|intcomma }}
+                                            </s><span style="color: red; font-size: 80%;"> {{ product.discount|floatformat:"0" }}% OFF</span>
+                                        </h6>
+                                        {% else %}
+                                        <h4 class="mb-1">
+                                            Ksh {{ product.price|floatformat:"0"|intcomma }}
+                                        </h4>
+                                        {% endif %}
+
+                                        {% for category in product.categories.all %}
+                                        <div class="badge badge-tag">
+                                            {{ category.title }}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div>
+                                        {% if product|is_in_cart:request.session.cart %}
+                                        <div class="row no-gutters">
+                                            <form action="{% url 'add_to_cart' %}" method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" value="{{ product.id }}" name="product">
+                                                <input type="hidden" value="True" name="remove">
+                                                <input type="submit" value="-" class="btn btn-success">
+                                            </form>
+                                            <div class="text-center mt-2 text-black"><h3 class="mx-2 mb-3"> {{ product|quantity_in_cart:request.session.cart }}</h3> </div>
+                                            <form action="{% url 'add_to_cart' %}" method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" value="{{ product.id }}" name="product">
+                                                
+                                                {% if product|quantity_in_cart:request.session.cart <= product.quantity|sub:1 %}
+                                                    <input type="submit" value="+" class="btn btn-success">
+                                                {% else %}
+                                                    <input type="submit" value="+" class="btn btn-success" disabled>
+                                                {% endif %}
+                                                    
+                                            </form>
+                                        </div>
+
+                                        {% else %}
+                                        <form action="{% url 'add_to_cart' %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" value="{{ product.id }}" name="product">
+                                            
+                                            {% if product.quantity != 0 %}
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="material-icons md-18 align-middle">shopping_cart</i>
+                                                    <span class="align-middle">Add to cart</span>
+                                                </button>
+                                            {% else %}
+                                                <button type="submit" class="btn btn-success" disabled>
+                                                    <i class="material-icons md-18 align-middle">shopping_cart</i>
+                                                    <span class="align-middle">Add to cart</span>
+                                                </button>
+                                            {% endif %}
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="mb-0">Product Reviews</h4>
+                        <hr />
+                        <div class="row">
+                            <!-- for goes here -->
+                            <div class="col-lg-4">
+                                <div class="card card-review">
+                                    <div class="card-body">
+                                        <div class="media align-items-center">
+                                            <img src="assets/images/avatars/person-1.jpg" alt="Andrew Robles"
+                                                class="rounded-circle mr-2" width="35" />
+                                            <div class="media-body">
+                                                <div>
+                                                    Andrew Robles
+                                                    <small>said</small>
+                                                </div>
+                                                <div class="text-muted">
+                                                    This is a great product!
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <span class="text-muted">1 day ago</span>
+                                            <div>
+                                                <i class="material-icons md-18 align-middle text-warning">star</i>
+                                                <i class="material-icons md-18 align-middle text-warning">star</i>
+                                                <i class="material-icons md-18 align-middle text-warning">star</i>
+                                                <i class="material-icons md-18 align-middle text-warning">star</i>
+                                                <i class="material-icons md-18 align-middle text-warning">star_half</i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- for ends here -->
+                        </div>
+
+                        <h4 class="mb-0">People were also interested in</h4>
+                        <hr />
+
+                        <div class="owl-carousel owl-theme">
+
+
+                            {% for product in related_products %}
+                            <div class="card card-product">
+                                <a href="{{ product.get_absolute_url }}">
+                                    <img src="{{ product.image.url }}" alt="product image" class="card-img-top" width="100"/>
+                                </a>
+                                <div class="card-body">
+                                    <a href="{{ product.get_absolute_url }}" class="h4 text-primary-dark mb-0">{{ product.name }}</a>
+                                    <p class="card-text">
+                                        {{ product.description|truncatewords:"15"}}
+                                    </p>
+                                    <div class="lead text-primary">
+                                        Ksh {{ product.price|floatformat:"0"|intcomma }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- // END drawer-layout__content -->
+
+        <!-- drawer -->
+        <div class="mdk-drawer js-mdk-drawer" id="default-drawer">
+            <div class="mdk-drawer__content">
+                <div class="mdk-drawer__inner" data-simplebar data-simplebar-force-enabled="true">
+                    <nav class="drawer drawer--dark">
+                        <div class="drawer-spacer">
+                            <div class="media align-items-center">
+                                <div class="media-body">
+                                    <a href="{% url 'home' %}" class="h5 m-0 text-link">Categories</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PAGES MENU -->
+                        <ul class="drawer-menu" id="pagesMenu" data-children=".drawer-submenu">
+                            <li class="drawer-menu-item drawer-submenu">
+                            {% for category in categories %}
+                                <li class="drawer-menu-item">
+                                    <a href="/?category={{ category.slug }}">{{ category.title }}</a>
+                                </li>
+                            {% endfor %}
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <!-- // END drawer -->
+    </div>
+    <!-- // END drawer-layout -->
+</body>
+{% endblock content %}
