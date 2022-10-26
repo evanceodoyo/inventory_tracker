@@ -1,10 +1,8 @@
-from itertools import product
-from statistics import mode
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.db.models.signals import pre_save
-
+from django.db.models import F
 from accounts.models import Supplier
 from .utils import unique_order_id_generator
 
@@ -65,7 +63,7 @@ def update_product_status(sender, instance, *args, **kwargs): # TO DO ; MOve to 
     """
     Update the product status on every update/save.
     """
-    if  instance.quantity < 1:
+    if  int(instance.quantity) < 1:
         instance.status = False
     else:
         instance.status = True

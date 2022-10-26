@@ -216,12 +216,12 @@
                                                     </a>
                                             
                                                     <div class="dropdown-menu">
-                                                        <a class="dropdown-item" href="#">
+                                                        <a class="dropdown-item" href="{% url 'edit_product' product.slug %}">
                                                             <i class="material-icons md-14 align-middle">edit</i>
                                                             <span class="align-middle">Edit</span>
                                                         </a>
                                                         
-                                                        <a class="dropdown-item" href="#">
+                                                        <a class="dropdown-item" href="?product_id={{ product.id }}">
                                                             <i class="material-icons md-14 align-middle">shopping_cart</i>
                                                             <span class="align-middle">Add to cart</span>
                                                         </a>

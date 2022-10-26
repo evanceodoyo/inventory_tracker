@@ -80,7 +80,7 @@
                                                             <option value='Vihiga'>Vihiga</option>
                                                             <option value='West Pokot'>West Pokot</option>
                                                             <option value='wajir'>wajir</option>
-                                                            <option value='{{ shipping_address.county }}' selected>{{ shipping_address.county }}</option>
+                                                            <option value='{{ shipping_address.county|default_if_none:"Nairobi" }}' selected>{{ shipping_address.county|default_if_none:"Nairobi" }}</option>
                                                         </select>
                                                     </div>
                                                     <div class="form-group col-md-6">

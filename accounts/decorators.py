@@ -17,3 +17,13 @@ def supplier_required(view_func):
         else:
             return view_func(request, *args, **kwargs)
     return wrapper_func
+
+
+def retailer_required(view_func):
+    def wrapper_func(request, *args, **kwargs):
+        if request.user.is_superuser or request.user.user_type == 'retailer':
+            return view_func(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+
+    return wrapper_func

@@ -45,25 +45,26 @@ def add_to_cart(request):
         product = Product.objects.get(id=product_id)
         cart = request.session.get("cart")
         remove = request.POST.get('remove')
-
+        add_msg = "Item added to cart successfully"
         if cart:
             if quantity := cart.get(product_id):
+                update_msg = "Item quantity updated successfully"
                 if remove:
                     if quantity <= 1:
                         cart.pop(product_id)
                         messages.success(request, "Item removed from cart successfully")
                     else:
                         cart[product_id] = quantity - 1
-                    messages.success(request, "Item quantity updated")
+                        messages.success(request, update_msg)
                 else:
                     cart[product_id] = quantity + 1
-                    messages.success(request, "Item added successfully")
+                    messages.success(request, update_msg)
             else:
                 cart[product_id] = 1
-                messages.success(request, "Item added to cart successfully")
+                messages.success(request, add_msg)
         else:
             cart = {product_id: 1}
-            messages.success(request, "Item added to cart successfully")
+            messages.success(request, add_msg)
 
         request.session["cart"] = cart
     return redirect(product)
@@ -75,10 +76,6 @@ def cart(request):
     ids to get the items from the database.
     """
     try:
-        # if not request.session.get('cart'):
-        #     messages.info(request, 'Your cart is empty. Please add items to cart')
-        #     return redirect("home")
-
         cart = request.session.get('cart')
         cart_items = Product.get_products_by_ids(list(cart.keys()))
         context = {"page_title": "Cart", 'cart_items': cart_items}
@@ -89,9 +86,9 @@ def cart(request):
             return redirect('cart')
 
         return render(request, 'shopping-cart.html', context)
-    except Exception as e:
-        raise e
-
+    except Exception:
+        return render(request, 'shopping-cart.html')
+    
 
 def clear_cart(request):
     """
@@ -165,7 +162,6 @@ def payment(request):
     if not request.session.get('cart'):
         messages.info(request, "Please add items to your cart")
         return redirect('home')
-    # TO DO: Handle race condition
     if request.method == 'POST':
         phone = request.POST.get('phone')
         user = request.user
@@ -179,25 +175,19 @@ def payment(request):
         )
         order.save()
 
-        for item in order_items:
-            order_item = OrderItem(order=order, item=item, quantity=cart.get(str(item.id)))
-            order_item.save()
+        # use select_for_update() to obtain a lock on the items
+        # and avoiding race conditions.
+        for item in order_items.select_for_update():
+            order_item = OrderItem.objects.create(order=order, item=item, quantity=cart.get(str(item.id)))
             item.quantity -= order_item.quantity
             item.save()
+            item.refresh_from_db()
         
-        payment = Payment(
+        Payment.objects.create(
             order=order,
             customer=user,
             phone = phone,
             amount=order.amount
         )
-        payment.save()
         request.session['cart'] = {}
         return redirect("home")
-
-
-
-
-    
-
-

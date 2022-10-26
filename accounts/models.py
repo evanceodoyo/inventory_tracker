@@ -28,6 +28,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
+        self.user_type = 'retailer'
 
         if extra_fields.get("is_staff") is not True:
             raise ValueError(_("Superuser must have is_staff=True."))
@@ -37,15 +38,15 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    USER_TYPE = (
-        ("SUPPLIER", "supplier"),
-        ("RETAILER", "retailer"),
-        ("CUSTOMER", "customer"),
-    )
+    class UserType(models.TextChoices):
+        SUPPLIER = 'SUPPLIER', 'Supplier'
+        RETAILER = 'RETAILER', 'Retailer'
+        CUSTOMER = 'CUSTOMER', 'Customer'
+
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField(max_length=255, unique=True)
-    user_type = models.CharField(choices=USER_TYPE, default="customer", max_length=10)
+    user_type = models.CharField(choices=UserType.choices, default=UserType.CUSTOMER, max_length=10)
     is_active = models.BooleanField("Active", default=True)
     avatar = models.ImageField(
         default="accounts/avatars/default.jpeg", upload_to="accounts/avatars"

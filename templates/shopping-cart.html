@@ -45,17 +45,13 @@
                                 </ol>
                             </div>
                             <div class="col-lg-6 text-lg-right">
-                                {% if request.session.cart %}
+                        {% if request.session.cart %}
                                 <a href="{% url 'clear_cart' %}" class="btn btn-primary">
                                     <i class="material-icons md-18 align-middle">remove_shopping_cart</i>
                                     <span class="align-middle">Clear</span>
                                 </a>
-                                {% endif %}
                             </div>
                         </div>
-                        
-                        {% if cart_items %}
-                              
                         <div class="card">
                             <div class="table-responsive">
                                 <table class="table table-cart">

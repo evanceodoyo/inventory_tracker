@@ -1,5 +1,4 @@
-from unicodedata import name
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
@@ -18,19 +17,19 @@ from . models import Supplier
 
 User = get_user_model()
 
-# def validate_user(user):
-#     error_msg = None
-#     if not user.first_name:
-#         error_msg = "First Name required!"
-#     elif not user.last_name:
-#         error_msg = "Last Name"
-#     elif not user.email:
-#         error_msg = "Email required"
-#     elif user.email_exists():
-#         error_msg = "A user with the email already exists"
-#     elif not user.password:
-#         error_msg = "Password required!"
-#     return error_msg
+def validate_user(user):
+    error_msg = None
+    if not user.first_name:
+        error_msg = "First Name required!"
+    elif not user.last_name:
+        error_msg = "Last Name required"
+    elif not user.email:
+        error_msg = "Email required"
+    elif user.email_exists():
+        error_msg = "A user with the email already exists"
+    # elif not user.password:
+    #     error_msg = "Password required!"
+    return error_msg
 
 @unauthenticated_user
 def sign_up(request):
@@ -39,7 +38,6 @@ def sign_up(request):
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
-        company = request.POST.get('company')
         user_type = request.POST.get('user_type')
         password = request.POST.get('password')
 
@@ -47,29 +45,28 @@ def sign_up(request):
             first_name = first_name,
             last_name = last_name,
             email = email,
-            company = company,
         )
 
-        error_msg = None
-        # error_msg = validate_user(user)
-        if not error_msg:
+        if error_msg := validate_user(user):
+            messages.error(request, error_msg)
+        else:
             if user_type == 'supplier':
-                user.user_type = 'supplier' 
-            elif user_type == 'retailer':
-                user.user_type = 'retailer'
+                user.user_type = 'supplier'
             user.set_password(password)
             user.save()
             if user := authenticate(request, username=email, password=password):
                 login(request, user)
                 return redirect("home")
-        context = {"page_title": "Sign Up", "error_msg": error_msg}
+        context = {"page_title": "Sign Up", "email": email, 'first_name': first_name, "last_name": last_name}
     return render(request, 'signup.html', context)
 
 @unauthenticated_user
 def login_view(request):
+    context = {"page_title": "Login"}
     if request.method == "POST":
         email = request.POST.get('email')
         password = request.POST.get('password')
+        context['email'] = email
 
         if user := authenticate(request, username=email, password=password):
             login(request, user)
@@ -81,7 +78,7 @@ def login_view(request):
         else:
             messages.error(request, "Invalid email or password")
 
-    return render(request, 'login.html', {"page_title": "Login"})
+    return render(request, 'login.html', context)
 
 def logout_view(request):
     logout(request)
@@ -91,11 +88,11 @@ def logout_view(request):
 @login_required
 def profile(request):
     try:
-        user = User.objects.get(id=request.user.id)
+        user = request.user
+        user = User.objects.get(id=user.id)
         orders = Order.objects.filter(customer=user)[:10]
-        products = Product.objects.all()
         shipping_address = ShippingAddress.objects.filter(customer=user).first()
-        supplier = Supplier.objects.get(name=user)
+        context = {"page_title": "Profile", "user": user, "addr": shipping_address, 'orders': orders}
         if request.method == 'POST':
             first_name = request.POST.get('first_name')
             last_name = request.POST.get('last_name')
@@ -115,10 +112,15 @@ def profile(request):
                 shipping_address = ShippingAddress.objects.create(customer=user, street=street, apartment=apartment, phone=phone)
             messages.success(request, 'Profile update successfull')
             return redirect('profile')
-
-        return render(request, 'account.html', {"page_title": "Profile", "user": user, "addr": shipping_address, 'orders': orders, 'products': products, "supplier": supplier})
-    except Exception as e:
-        raise e
+        if user.user_type == 'supplier':
+            supplier = Supplier.objects.get(name=user)
+            products = Product.objects.all()
+            context['supplier'] = supplier
+            context['products'] = products
+        return render(request, 'account.html', context)
+        
+    except User.DoesNotExist:
+        raise Http404
 
 
 @login_required
@@ -194,6 +196,7 @@ def password_reset(request):
 
 
 @login_required
+@supplier_required
 @transaction.atomic
 def supplier_update(request):
     user = User.objects.get(id=request.user.id)
@@ -206,9 +209,7 @@ def supplier_update(request):
         registration_number = request.POST.get('registration_number')
         payment_account = request.POST.get('payment_account')
         products_supplied = request.POST.getlist('products_supplied')
-        print(products_supplied)
         products = Product.get_products_by_ids(products_supplied)
-        print(products)
 
         try:
             supplier = Supplier.objects.get(name=user)
@@ -226,7 +227,7 @@ def supplier_update(request):
             messages.success(request, "Company details updated successfully")
             return redirect('profile')
         except Supplier.DoesNotExist:
-            supplier = Supplier(
+            supplier = Supplier.objects.create(
                 name = user,
                 company_name = company_name,
                 store_location = store_location,
@@ -236,7 +237,6 @@ def supplier_update(request):
                 registration_number = registration_number,
                 payment_account = payment_account,
             )
-            supplier.save()
             for product in products:
                 ProductSupplier.objects.create(
                     supplier = supplier,
