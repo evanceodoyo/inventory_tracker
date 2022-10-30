@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('shop', '0002_rename_tag_category_rename_tags_product_categories_and_more'),
+        ("shop", "0002_rename_tag_category_rename_tags_product_categories_and_more"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='category',
-            options={'ordering': ['created'], 'verbose_name_plural': 'Categories'},
+            name="category",
+            options={"ordering": ["created"], "verbose_name_plural": "Categories"},
         ),
         migrations.AddField(
-            model_name='category',
-            name='slug',
-            field=models.SlugField(default='default'),
+            model_name="category",
+            name="slug",
+            field=models.SlugField(default="default"),
             preserve_default=False,
         ),
     ]

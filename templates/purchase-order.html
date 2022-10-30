@@ -111,64 +111,65 @@
                                     {% endfor %}
                                 </tbody>
                             </table>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="note">Order Notes</label>
-                                        <textarea name="note" id="note" cols="30" rows="7"
-                                            class="form-control"></textarea>
-                                    </div>
-
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="card card-body bg-light mb-3">
-                                                <div class="text-muted">Vendor owes</div>
-                                                <div>&dollar;50.00</div>
-                                            </div>
+                            <form action="" method="post">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="note">Order Notes</label>
+                                            <textarea name="note" id="note" cols="30" rows="7"
+                                                class="form-control"></textarea>
                                         </div>
-                                        <div class="col">
-                                            <div class="card card-body bg-light mb-3">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <div>
-                                                        <div class="text-muted">In Credit</div>
-                                                        <div>Ksh {{ balance|floatformat:"0"| intcomma }}</div>
+
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="card card-body bg-light mb-3">
+                                                    <div class="text-muted">Vendor owes</div>
+                                                    <div>&dollar;50.00</div>
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="card card-body bg-light mb-3">
+                                                    <div class="d-flex align-items-center justify-content-between">
+                                                        <div>
+                                                            <div class="text-muted">In Credit</div>
+                                                            <div>Ksh {{ balance|floatformat:"0"| intcomma }}</div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="card card-body card-subtotals bg-light">
-                                        <ul class="list-unstyled">
-                                            <li>
-                                                <div>Units Ordered</div>
-                                                <div>{{ cart_products|units_ordered|default_if_none:"0" }}</div>
-                                            </li>
-                                            <li>
-                                                <div>Subtotal</div>
-                                                <div>Ksh {{ cart_products|purchase_order_subtotal| floatformat:"0"|intcomma|default_if_none:"0" }}</div>
-                                            </li>
-                                            <!-- <li>
+                                        <div class="card card-body card-subtotals bg-light">
+                                            <ul class="list-unstyled">
+                                                <li>
+                                                    <div>Units Ordered</div>
+                                                    <div>{{ cart_products|units_ordered|default_if_none:"0" }}</div>
+                                                </li>
+                                                <li>
+                                                    <div>Subtotal</div>
+                                                    <div>Ksh {{ cart_products|purchase_order_subtotal|
+                                                        floatformat:"0"|intcomma|default_if_none:"0" }}</div>
+                                                </li>
+                                                <!-- <li>
                                                 <div>Tax</div>
                                                 <div>Ksh 0</div>
                                             </li> -->
-                                        </ul>
-                                        <div class="d-flex align-items-center justify-content-between mb-3">
-                                            <div>Shipping &amp; Handling</div>
-                                            <input type="text" class="form-control input-sm" value="55.00">
-                                        </div>
-                                        <hr>
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <strong>Total:</strong>
-                                            <strong>&dollar;9552</strong>
+                                            </ul>
+                                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                                <div>Shipping &amp; Handling</div>
+                                                <input type="text" class="form-control input-sm" value="55.00">
+                                            </div>
+                                            <hr>
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <strong>Total:</strong>
+                                                <strong>&dollar;9552</strong>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <h1 class="h4 mb-0">2. Supplier</h1>
-                            <hr>
-                            <form action="#" class="mb-3">
+                                <h1 class="h4 mb-0">2. Supplier</h1>
+                                <hr>
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
@@ -189,26 +190,26 @@
                                         </div>
                                     </div>
                                 </div>
+                                <h1 class="h4 mb-0">3. Order Dates</h1>
+                                <hr>
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="order_created">Order Created</label>
+                                            <input type="text" id="order_created"
+                                                class="datepicker-disabled form-control" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="order_expected">Order Created</label>
+                                            <input type="text" id="order_expected"
+                                                class="datepicker-new-order form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-success">Place Order</button>
                             </form>
-                            <h1 class="h4 mb-0">3. Order Dates</h1>
-                            <hr>
-                            <div class="row mb-3">
-                                <div class="col">
-                                    <div class="form-group">
-                                        <label for="order_created">Order Created</label>
-                                        <input type="text" id="order_created" class="datepicker-disabled form-control"
-                                            disabled>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="form-group">
-                                        <label for="order_expected">Order Created</label>
-                                        <input type="text" id="order_expected"
-                                            class="datepicker-new-order form-control">
-                                    </div>
-                                </div>
-                            </div>
-                            <button class="btn btn-success">Place Order</button>
                         </div>
                     </div>
                 </div>

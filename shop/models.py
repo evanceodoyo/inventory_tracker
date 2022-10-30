@@ -21,9 +21,9 @@ class Category(TimeStampedModel):
     description = models.CharField(max_length=300, blank=True, null=True)
 
     class Meta:
-        db_table = 'categories'
-        verbose_name_plural = 'Categories'
-        ordering = ['created']
+        db_table = "categories"
+        verbose_name_plural = "Categories"
+        ordering = ["created"]
 
     def __str__(self):
         return self.title
@@ -34,7 +34,7 @@ class Product(TimeStampedModel):
     description = models.TextField(max_length=500)
     slug = models.SlugField(max_length=50)
     categories = models.ManyToManyField(Category, related_name="products")
-    image = models.ImageField(upload_to='products/images')
+    image = models.ImageField(upload_to="products/images")
     sku = models.CharField(max_length=100)
     old_price = models.FloatField(default=0.0)
     price = models.FloatField()
@@ -44,20 +44,21 @@ class Product(TimeStampedModel):
     specifications = models.ManyToManyField("ProductSpecification", max_length=4)
 
     class Meta:
-        db_table = 'products'
+        db_table = "products"
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('product_detail', kwargs={'product_slug': self.slug})
+        return reverse("product_detail", kwargs={"product_slug": self.slug})
 
     def discount(self):
         if self.old_price > self.price:
-            return ((self.old_price - self.price) / self.old_price * 100)
+            return (self.old_price - self.price) / self.old_price * 100
 
-    def get_products_by_ids(product_ids): # sourcery skip
+    def get_products_by_ids(product_ids):  # sourcery skip
         return Product.objects.filter(id__in=product_ids)
+
 
 # def update_product_status(sender, instance, *args, **kwargs): # TO DO ; MOve to celery
 #     """
@@ -67,22 +68,27 @@ class Product(TimeStampedModel):
 #         instance.status = False
 #     else:
 #         instance.status = True
-        
+
 # pre_save.connect(update_product_status, sender=Product)
 
 
 class ProductSpecification(models.Model):
-    title = models.CharField("Product Specification/Feature", max_length=80, unique=True)
+    title = models.CharField(
+        "Product Specification/Feature", max_length=80, unique=True
+    )
 
     def __str__(self):
         return self.title
 
     class Meta:
-        db_table = 'product_specifications'
-        ordering = ['title']
+        db_table = "product_specifications"
+        ordering = ["title"]
+
 
 class ShippingAddress(TimeStampedModel):
-    customer = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='shipping_address')
+    customer = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="shipping_address"
+    )
     county = models.CharField(max_length=50, blank=True, null=True)
     street = models.CharField(max_length=80)
     apartment = models.CharField(max_length=80)
@@ -92,7 +98,7 @@ class ShippingAddress(TimeStampedModel):
         db_table = "shipping_address"
 
     def __str__(self):
-        return f'Shipping address for {self.customer}.'
+        return f"Shipping address for {self.customer}."
 
 
 class Order(TimeStampedModel):
@@ -102,31 +108,40 @@ class Order(TimeStampedModel):
         ("SHIPPED", "Shipped"),
         ("DELIVERED", "Delivered"),
         ("COMPLETED", "Completed"),
-        ("DISPUTED", "Disputed")
+        ("DISPUTED", "Disputed"),
     )
     order_id = models.CharField(max_length=10, unique=True)
-    customer = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, related_name="orders", null=True)
+    customer = models.ForeignKey(
+        get_user_model(), on_delete=models.SET_NULL, related_name="orders", null=True
+    )
     amount = models.FloatField()
     status = models.CharField(choices=ORDER_STATUS, default="Pending", max_length=20)
-    shipping_address = models.ForeignKey(ShippingAddress, on_delete=models.SET_NULL, null=True)
+    shipping_address = models.ForeignKey(
+        ShippingAddress, on_delete=models.SET_NULL, null=True
+    )
 
     class Meta:
         db_table = "orders"
 
     def __str__(self):
-        return f'Order #{self.order_id}'
+        return f"Order #{self.order_id}"
 
 
 def create_order_id(sender, instance, *args, **kwargs):
     if not instance.order_id:
         instance.order_id = unique_order_id_generator(instance)
 
+
 pre_save.connect(create_order_id, sender=Order)
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
-    item = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, related_name="items_sold")
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name="order_items"
+    )
+    item = models.ForeignKey(
+        Product, on_delete=models.SET_NULL, null=True, related_name="items_sold"
+    )
     quantity = models.PositiveIntegerField(default=1)
     date_ordered = models.DateTimeField(auto_now_add=True)
 
@@ -134,7 +149,7 @@ class OrderItem(models.Model):
         db_table = "order_items"
 
     def __str__(self):
-        return f'{self.item} in {self.order}'
+        return f"{self.item} in {self.order}"
 
 
 class Payment(models.Model):
@@ -152,11 +167,15 @@ class Payment(models.Model):
 
 
 class ProductSupplier(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="suppliers")
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='products')
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="suppliers"
+    )
+    supplier = models.ForeignKey(
+        Supplier, on_delete=models.CASCADE, related_name="products"
+    )
 
     class Meta:
-        db_table = 'product_suppliers'
+        db_table = "product_suppliers"
 
     def __str__(self):
         return self.supplier.company_name

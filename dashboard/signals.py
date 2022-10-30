@@ -17,12 +17,14 @@ def create_notification(sender, instance, **kwargs):
         msg = f'"<a href="{instance.get_absolute_url()}">{instance.name}" </a> is almost running out of stock. Reorder to avoid running out of stock'
         Notification.objects.create(
             product=instance,
-            message = msg,
+            message=msg,
         )
         send_mail(
-            'Product Stock Levels',
+            "Product Stock Levels",
             msg,
             settings.EMAIL_HOST_USER,
-            [settings.EMAIL_HOST_USER,],
+            [
+                settings.EMAIL_HOST_USER,
+            ],
             fail_silently=False,
         )

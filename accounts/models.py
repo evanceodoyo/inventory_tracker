@@ -28,7 +28,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
-        self.user_type = 'retailer'
+        self.user_type = "retailer"
 
         if extra_fields.get("is_staff") is not True:
             raise ValueError(_("Superuser must have is_staff=True."))
@@ -39,21 +39,22 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractUser):
     class UserType(models.TextChoices):
-        SUPPLIER = 'SUPPLIER', 'Supplier'
-        RETAILER = 'RETAILER', 'Retailer'
-        CUSTOMER = 'CUSTOMER', 'Customer'
+        SUPPLIER = "SUPPLIER", "Supplier"
+        RETAILER = "RETAILER", "Retailer"
+        CUSTOMER = "CUSTOMER", "Customer"
 
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField(max_length=255, unique=True)
-    user_type = models.CharField(choices=UserType.choices, default=UserType.CUSTOMER, max_length=10)
+    user_type = models.CharField(
+        choices=UserType.choices, default=UserType.CUSTOMER, max_length=10
+    )
     is_active = models.BooleanField("Active", default=True)
     avatar = models.ImageField(
         default="accounts/avatars/default.jpeg", upload_to="accounts/avatars"
     )
     password = models.CharField(max_length=100, editable=False)
     username = None
-
 
     objects = CustomUserManager()
 
@@ -70,7 +71,7 @@ class User(AbstractUser):
     # def get_absolute_url(self):
     #     return reverse("team_detail", args=[self.username])
     def get_fullname(self):
-        return f'{self.first_name} {self.last_name}'
+        return f"{self.first_name} {self.last_name}"
 
     def email_exists(self):
         return User.objects.filter(email=self.email).exists()
@@ -79,20 +80,15 @@ class User(AbstractUser):
 class Supplier(models.Model):
     name = models.OneToOneField(User, on_delete=models.CASCADE)
     company_name = models.CharField(max_length=255)
-    registration_number = models.CharField(max_length=100, default='')
-    store_location = models.CharField(max_length=200, default='')
-    office_location = models.CharField(max_length=200, default='')
-    phone = models.CharField(max_length=13, default='')
-    website_url = models.CharField(max_length=255, default='')
-    payment_account = models.CharField(max_length=80, default='')
-
+    registration_number = models.CharField(max_length=100, default="")
+    store_location = models.CharField(max_length=200, default="")
+    office_location = models.CharField(max_length=200, default="")
+    phone = models.CharField(max_length=13, default="")
+    website_url = models.CharField(max_length=255, default="")
+    payment_account = models.CharField(max_length=80, default="")
 
     class Meta:
-        db_table = 'suppliers'
+        db_table = "suppliers"
 
     def __str__(self):
         return self.company_name
-    
-
-
-
