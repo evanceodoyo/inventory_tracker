@@ -1,5 +1,6 @@
 {% load static %}
 {% load filters %}
+{% load humanize %}
 <div class="fixed-top">
     <nav class="navbar navbar-expand-md navbar-dark bg-primary">
         <div class="media align-items-center">
@@ -60,29 +61,20 @@
                                     href="#notifications" role="tab" aria-controls="notifications"
                                     aria-selected="true">Notifications</a>
                             </li>
-                            <!-- <li class="nav-item">
-                                <a class="nav-link" id="alerts-tab" data-toggle="tab" href="#alerts" role="tab"
-                                    aria-controls="alerts" aria-selected="false">Alerts</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="messages-tab" data-toggle="tab" href="#messages" role="tab"
-                                    aria-controls="messages" aria-selected="false">Messages</a>
-                            </li> -->
                         </ul>
                         <div class="tab-content" id="notifications-tabs">
                             <div class="tab-pane fade show active" id="notifications" role="tabpanel"
                                 aria-labelledby="notifications-tab">
                                 <ul class="list-group list-group-flush">
                                     
-                                    {% for notification in request.user.notifications.unread %}
+                                    {% for notification in notifications %}
                                     <li class="list-group-item">
                                         <div class="w-100">
                                             <a href="#">john</a>
-                                            received a new
-                                            quote
+                                            {{ notification.message }}
                                         </div>
                                         <div class="w-100 text-muted">
-                                            4 secs ago
+                                            {{ notification.created|naturaltime }}
                                         </div>
                                     </li>
                                     {% endfor %}
@@ -97,28 +89,6 @@
                                     </li>
                                 </ul>
                             </div>
-                            <!-- <div class="tab-pane fade" id="alerts" role="tabpanel" aria-labelledby="alerts-tab">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item text-right">
-                                        <a href="#">
-                                            <span class="align-middle">View
-                                                All</span>
-                                            <i class="material-icons md-18 align-middle">arrow_forward</i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="tab-pane fade" id="messages" role="tabpanel" aria-labelledby="messages-tab">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item text-right">
-                                        <a href="#">
-                                            <span class="align-middle">View
-                                                All</span>
-                                            <i class="material-icons md-18 align-middle">arrow_forward</i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div> -->
                         </div>
                     </div>
                 </li>

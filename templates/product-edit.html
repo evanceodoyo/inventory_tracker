@@ -50,9 +50,8 @@
                                         </div>
                                     </div>
                                     <div class="form-group col-md-6">
-                                        <label for="status">Product Status (Active/Inactive)</label>
                                         <div class="input-group input-group--inline">
-                                            <input type="checkbox" class="form-control" name="status" checked>
+                                            <label for="status">Product Active <input type="checkbox" name="status" {% if product.status %} checked {% endif %}></label>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-6">
@@ -111,3 +110,14 @@
         </div>
 </body>
 {% endblock content %}
+
+<!-- <div class="form-group">
+    <label for="tages">Tags</label>
+    <div class="d-flex justify-content-between mb-1">
+        <input type="text" id="tags" class="form-control mr-3">
+        <button class="btn btn-success">
+            <i class="material-icons md-18 align-middle">add_circle_outline</i>
+            <span class="align-middle">Add Tag</span>
+        </button>
+    </div>
+</div> -->

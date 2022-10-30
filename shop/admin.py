@@ -8,7 +8,7 @@ def short_name(self):
     return self.name if len(self.name) < 35 else f'{self.name[:33]}..'
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'quantity', 'reorder_level', 'old_price', 'price', 'created']
+    list_display = ['name', 'quantity', 'reorder_level', 'old_price', 'price', 'status', 'created']
     prepopulated_fields = {'slug': ('name',)}
     
 

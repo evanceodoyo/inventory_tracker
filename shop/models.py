@@ -59,28 +59,16 @@ class Product(TimeStampedModel):
     def get_products_by_ids(product_ids): # sourcery skip
         return Product.objects.filter(id__in=product_ids)
 
-def update_product_status(sender, instance, *args, **kwargs): # TO DO ; MOve to celery
-    """
-    Update the product status on every update/save.
-    """
-    if  int(instance.quantity) < 1:
-        instance.status = False
-    else:
-        instance.status = True
-        
-    
-
-pre_save.connect(update_product_status, sender=Product)
-
-# @register.filter(name="send_notification")
-# def send_notification(product):
-#     if product.quantity <= product.reoder_level:
-#         sender = settings.EMAIL_HOST_USER
-#         recipient = 'admin@gmail.com'
-#         message = f'{product.name} is soon running out of stock, reorder now'
-#         notify.send(actor=sender, recipient=recipient, verb='Stock Level notification', description=message)
+# def update_product_status(sender, instance, *args, **kwargs): # TO DO ; MOve to celery
+#     """
+#     Update the product status on every update/save.
+#     """
+#     if instance.status and  int(instance.quantity) < 1:
+#         instance.status = False
 #     else:
-#         pass
+#         instance.status = True
+        
+# pre_save.connect(update_product_status, sender=Product)
 
 
 class ProductSpecification(models.Model):
@@ -116,7 +104,7 @@ class Order(TimeStampedModel):
         ("COMPLETED", "Completed"),
         ("DISPUTED", "Disputed")
     )
-    order_id = models.CharField(max_length=50, unique=True)
+    order_id = models.CharField(max_length=10, unique=True)
     customer = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, related_name="orders", null=True)
     amount = models.FloatField()
     status = models.CharField(choices=ORDER_STATUS, default="Pending", max_length=20)
@@ -147,6 +135,7 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'{self.item} in {self.order}'
+
 
 class Payment(models.Model):
     customer = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True)

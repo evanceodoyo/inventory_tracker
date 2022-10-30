@@ -180,6 +180,8 @@ def payment(request):
         for item in order_items.select_for_update():
             order_item = OrderItem.objects.create(order=order, item=item, quantity=cart.get(str(item.id)))
             item.quantity -= order_item.quantity
+            if item.quantity < 1:
+                item.status = False
             item.save()
             item.refresh_from_db()
         

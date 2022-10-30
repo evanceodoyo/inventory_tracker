@@ -1,6 +1,7 @@
 from django import template
 from shop.models import OrderItem
 from django.db.models import Sum
+from dashboard.models import PurchaseCartProduct
 
 register = template.Library()
 
@@ -40,13 +41,15 @@ def quantity_sold(product):
     # print(item)
     return item['qty_sold']
 
-# @register.filter(name="send_notification")
-# def send_notification(request, product):
-#     if product.quantity <= product.reorder_level:
-#         sender = settings.EMAIL_HOST_USER
-#         recipient = 'admin@gmail.com'
-#         message = f'{product.name} is soon running out of stock, reorder now'
-#         notify.send(sender, recipient=recipient, verb='Stock Level notification', description=message)
-#     else:
-#         pass
-    
+@register.filter(name='product_in_purchase_cart')
+def product_in_purchase_cart(product):
+    return PurchaseCartProduct.objects.filter(product=product).exists()
+
+@register.filter(name='units_ordered')
+def units_ordered(cart_products):
+    return sum(p.quantity for p in cart_products)
+
+@register.filter(name="purchase_order_subtotal")
+def purchase_order_subtotal(cart_products):
+    return sum((p.quantity * p.product.price) for p in cart_products)
+
