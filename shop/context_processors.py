@@ -7,5 +7,5 @@ def global_context_renderer(request):
         "page_title": settings.PAGE_TITLE,
         "site_name": settings.SITE_NAME,
         "site_icon": "M",
-        "notifications": Notification.objects.all(),
+        "notifications": Notification.objects.select_related("product")[:5],
     }

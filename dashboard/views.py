@@ -1,17 +1,22 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator, InvalidPage
 from shop.models import Category, Order, Product, ProductSpecification
-from django.contrib.auth.decorators import login_required
 from accounts.decorators import retailer_required
 from django.contrib import messages
 from accounts.models import Supplier
 from django.db.models import Sum
-from .models import PurchaseCartProduct, PurchaseOrder, PurchaseOrderProduct
+from django.db import transaction
+from .models import (
+    Notification,
+    PurchaseCartProduct,
+    PurchaseOrder,
+    PurchaseOrderProduct,
+    PurchaseOrderPayment,
+)
 
 from django.db.models import F
 
 
-@login_required
 @retailer_required
 def dashboard(request):
     try:
@@ -34,7 +39,6 @@ def dashboard(request):
         raise e
 
 
-@login_required
 @retailer_required
 def edit_product(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug)
@@ -82,7 +86,6 @@ def edit_product(request, product_slug):
     )
 
 
-@login_required
 @retailer_required
 def delete_product(request, product_slug):
     if request.method == "POST":
@@ -93,7 +96,6 @@ def delete_product(request, product_slug):
     return redirect("dashboard")
 
 
-@login_required
 @retailer_required
 def activate_deactivate_product(request, product_slug):
     if request.method == "POST":
@@ -105,7 +107,6 @@ def activate_deactivate_product(request, product_slug):
     return redirect("dashboard")
 
 
-@login_required
 @retailer_required
 def add_to_reorder_cart(request):
     if request.method == "POST":
@@ -126,6 +127,7 @@ def recommend_suppliers(cart_products):
 
 def reorder(request):
     cart_products = PurchaseCartProduct.objects.select_related("product")
+    suppliers = Supplier.objects.all()
     balance = Order.objects.aggregate(bal=Sum("amount"))
     if request.method == "POST":
         cart_product = cart_products.get(id=int(request.POST["cart_product"]))
@@ -149,6 +151,7 @@ def reorder(request):
         {
             "page_title": "Products Reorder",
             "cart_products": cart_products,
+            "suppliers": suppliers,
             "balance": balance["bal"],
         },
     )
@@ -166,3 +169,68 @@ def remove_from_cart(request):
             product.delete()
             return redirect("reorder")
     return redirect("reorder")
+
+
+@transaction.atomic
+def place_purchase_order(request):
+    if cart_products := PurchaseCartProduct.objects.select_related("product"):
+        total = sum((p.quantity * p.product.price) for p in cart_products)
+        if request.method == "POST":
+            order_notes = request.POST.get("order_notes")
+            supplier = request.POST.get("supplier")
+            # pay_agreement = request.POST.get('pay_agreement')
+            purchase_order = PurchaseOrder(
+                user=request.user,
+                amount=total,
+                supplier=supplier,
+                order_notes=order_notes,
+            )
+            purchase_order.save()
+            PurchaseOrderPayment.objects.create(
+                purchase_order=purchase_order, amount=purchase_order.amount
+            )
+
+            for p in cart_products.select_for_update():
+                PurchaseOrderProduct.objects.create(
+                    supplier=supplier,
+                    purchase_order=purchase_order,
+                    product=p.product,
+                    quantity=p.quantity,
+                )
+                p.delete()
+            messages.success(request, "Purchase order placed successfully.")
+    else:
+        messages.success(request, "No products in cart to reorder")
+
+    return redirect("dashboard")
+
+
+def notifications(request):
+    notifications = Notification.objects.select_related("product").order_by(
+        "-created", "-unread"
+    )
+    products = Product.objects.filter(notification_sent=False).order_by("quantity")[:15]
+    if request.method == "POST":
+        notification = get_object_or_404(
+            Notification, id=request.POST.get("notification_id")
+        )
+        if "read" in request.POST:
+            notification.unread = False
+            notification.save()
+            messages.success(request, "Notification marked as read.")
+            return redirect("notifications")
+        if "delete" in request.POST:
+            notification.delete()
+            messages.info(request, "Notification deleted successfully.")
+            return redirect("notifications")
+
+    return render(
+        request,
+        "notifications.html",
+        {
+            "page_title": "Notifications",
+            "notifications": notifications,
+            "products": products,
+            "l": list(range(3)),
+        },
+    )

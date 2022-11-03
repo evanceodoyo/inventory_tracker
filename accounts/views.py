@@ -14,6 +14,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 from django.db import transaction
 from .models import Supplier
+from django.views.decorators.csrf import csrf_exempt
+
 
 User = get_user_model()
 
@@ -53,7 +55,7 @@ def sign_up(request):
             messages.error(request, error_msg)
         else:
             if user_type == "supplier":
-                user.user_type = "supplier"
+                user.user_type = "SUPPLIER"
             user.set_password(password)
             user.save()
             if user := authenticate(request, username=email, password=password):
@@ -68,6 +70,7 @@ def sign_up(request):
     return render(request, "signup.html", context)
 
 
+@csrf_exempt
 @unauthenticated_user
 def login_view(request):
     context = {"page_title": "Login"}
@@ -98,8 +101,8 @@ def logout_view(request):
 @login_required
 def profile(request):
     try:
-        user = request.user
-        user = User.objects.get(id=user.id)
+        usr = request.user
+        user = User.objects.get(id=usr.id)
         orders = Order.objects.filter(customer=user)[:10]
         shipping_address = ShippingAddress.objects.filter(customer=user).first()
         context = {
@@ -129,8 +132,8 @@ def profile(request):
                 )
             messages.success(request, "Profile update successfull")
             return redirect("profile")
-        if user.user_type == "supplier":
-            supplier = Supplier.objects.get(name=user)
+        if usr.user_type == "SUPPLIER":
+            supplier = Supplier.objects.get_or_create(name=usr)
             products = Product.objects.all()
             context["supplier"] = supplier
             context["products"] = products

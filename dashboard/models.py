@@ -1,4 +1,4 @@
-import uuid
+from email.policy import default
 from django.db import models
 from accounts.models import Supplier
 from shop.models import Product, TimeStampedModel
@@ -8,19 +8,23 @@ from shop.utils import unique_order_id_generator
 
 
 class PurchaseOrder(TimeStampedModel):
-    purchase_order_id = models.CharField(max_length=10, unique=True)
+    order_id = models.CharField(max_length=10, unique=True)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True)
     amount = models.FloatField()
+    order_notes = models.TextField(default="")
+    # is_paid = models.BooleanField(default=False)
 
     class Meta:
         db_table = "purchase_orders"
 
     def __str__(self):
-        return f"Purchase Order #{self.purchase_order_id}"
+        return f"Purchase Order #{self.order_id}"
 
 
 def create_purchase_order_id(sender, instance, *args, **kwargs):
-    if not instance.purchase_order_id:
-        instance.purchase_order_id = unique_order_id_generator(instance)
+    if not instance.order_id:
+        instance.order_id = unique_order_id_generator(instance)
 
 
 pre_save.connect(create_purchase_order_id, sender=PurchaseOrder)
@@ -46,6 +50,18 @@ class PurchaseOrderProduct(TimeStampedModel):
         return self.product.price * self.quantity
 
 
+class PurchaseOrderPayment(models.Model):
+    purchase_order = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE)
+    amount = models.FloatField()
+    transaction_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "purchase_order_payments"
+
+    def __str__(self):
+        return f"{self.purchase_order}: Amount {self.amount}"
+
+
 class PurchaseCartProduct(TimeStampedModel):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
@@ -66,12 +82,12 @@ class Notification(models.Model):
         Product, on_delete=models.CASCADE, related_name="notifications"
     )
     message = models.CharField(max_length=400)
-    is_sent = models.BooleanField(default=False)
+    unread = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "notifications"
-        ordering = ["created"]
+        ordering = ["-created"]
 
     def __str__(self):
         return f"{self.message} for {self.product.name}"

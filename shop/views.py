@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator, InvalidPage
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from payments.views import lipa_na_mpesa_online
 
 
 def home(request):
@@ -180,6 +181,7 @@ def get_order_total(cart):
     return total
 
 
+@login_required
 @transaction.atomic
 def payment(request):
     if not request.session.get("cart"):
@@ -210,8 +212,10 @@ def payment(request):
             item.save()
             item.refresh_from_db()
 
+        lipa_na_mpesa_online(request, phone=phone, amount=order.amount)
         Payment.objects.create(
             order=order, customer=user, phone=phone, amount=order.amount
         )
+
         request.session["cart"] = {}
         return redirect("home")

@@ -2,6 +2,7 @@
 {% load static %}
 {% load filters %}
 {% load humanize %}
+{% load mathfilters %}
 {% block content %}
 
 <body>
@@ -111,13 +112,13 @@
                                     {% endfor %}
                                 </tbody>
                             </table>
-                            <form action="" method="post">
+                            <form action="{% url 'place_purchase_order' %}" method="post">
+                                {% csrf_token %}
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="note">Order Notes</label>
-                                            <textarea name="note" id="note" cols="30" rows="7"
-                                                class="form-control"></textarea>
+                                            <textarea name="order_notes" id="note" cols="30" rows="7"  class="form-control"></textarea>
                                         </div>
 
                                     </div>
@@ -134,7 +135,7 @@
                                                     <div class="d-flex align-items-center justify-content-between">
                                                         <div>
                                                             <div class="text-muted">In Credit</div>
-                                                            <div>Ksh {{ balance|floatformat:"0"| intcomma }}</div>
+                                                            <div>Ksh {{ balance|floatformat:"0"|intcomma }}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -146,20 +147,24 @@
                                                     <div>Units Ordered</div>
                                                     <div>{{ cart_products|units_ordered|default_if_none:"0" }}</div>
                                                 </li>
+                                                
+                                                {% with ct=cart_products|purchase_order_subtotal  %}
                                                 <li>
                                                     <div>Subtotal</div>
-                                                    <div>Ksh {{ cart_products|purchase_order_subtotal|
-                                                        floatformat:"0"|intcomma|default_if_none:"0" }}</div>
+                                                    <div>Ksh {{ ct|floatformat:"0"|intcomma|default_if_none:"0" }}</div>
                                                 </li>
+                                                {% endwith %}
                                                 <!-- <li>
                                                 <div>Tax</div>
                                                 <div>Ksh 0</div>
                                             </li> -->
                                             </ul>
-                                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                            # Assumptions: tax and handling costs inclusive
+                                            <!-- Assuming that tax and handling cost is inclusive. -->
+                                            <!-- <div class="d-flex align-items-center justify-content-between mb-3">
                                                 <div>Shipping &amp; Handling</div>
-                                                <input type="text" class="form-control input-sm" value="55.00">
-                                            </div>
+                                                <input type="text" class="form-control" value="{{ ct|mul:0.1|floatformat:'2'|intcomma|default_if_none:'0' }}">
+                                            </div> -->
                                             <hr>
                                             <div class="d-flex align-items-center justify-content-between">
                                                 <strong>Total:</strong>
@@ -174,41 +179,48 @@
                                     <div class="col">
                                         <div class="form-group">
                                             <label for="supplier">Recommended Suppliers</label>
-                                            <select class="select-2">
-                                                <option value="1">San Francisco Store</option>
-                                                <option value="2">Seattle Store</option>
+                                            <select class="form-control" required>
+                                                {% for supplier in suppliers %}
+                                                <option value="{{ supplier.id }}">{{ supplier.company_name }}</option>
+                                                {% endfor %}
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="form-group">
                                             <label for="supplier">All Suppliers</label>
-                                            <select class="select-2">
+                                            <select class="form-control">
                                                 <option value="2">Seattle Store</option>
                                                 <option value="3">Washington Store</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-                                <h1 class="h4 mb-0">3. Order Dates</h1>
+                                <h1 class="h4 mb-0">3. Payment</h1>
                                 <hr>
                                 <div class="row mb-3">
+                                    <!-- <div class="col">
+                                        <div class="form-group">
+                                            <label for="pay_agreement">Pay After Consigment has been delivered <input type="checkbox" name="pay_agreement" class="form-control"></label>
+                                        </div>
+                                    </div> -->
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="order_created">Order Created</label>
-                                            <input type="text" id="order_created"
-                                                class="datepicker-disabled form-control" disabled>
+                                            <label for="payment_type">Payment Type</label>
+                                            <select class="form-control">
+                                                <option value="m_pesa" selected>M-Pesa</option>
+                                                <option value="account_transfer" disabled>Account Transfer</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="order_expected">Order Created</label>
-                                            <input type="text" id="order_expected"
-                                                class="datepicker-new-order form-control">
+                                            <label for="account_no">M-Pesa / Account Number</label>
+                                            <input type="text" name="account_no" class="form-control">
                                         </div>
                                     </div>
                                 </div>
-                                <button class="btn btn-success">Place Order</button>
+                                <button type="submit" class="btn btn-success">Place Order</button>
                             </form>
                         </div>
                     </div>
@@ -219,39 +231,5 @@
         <!-- // END drawer-layout__content -->
     </div>
     <!-- // END drawer-layout -->
-
-    <script>
-        $('.select-2').select2({
-            theme: 'bootstrap',
-            placeholder: 'Select an option'
-        });
-
-        $('.datepicker-new-order').datepicker({
-            orientation: 'auto'
-        });
-
-        // Get current date
-        let today = new Date();
-        let dd = today.getDate();
-        let mm = today.getMonth() + 1;
-        const yyyy = today.getFullYear();
-
-        if (dd < 10) {
-            dd = '0' + dd
-        }
-
-        if (mm < 10) {
-            mm = '0' + mm
-        }
-
-        today = mm + '/' + dd + '/' + yyyy;
-
-        $('.datepicker-disabled').val(today)
-
-        $('.select2-results').append(`<a href="#">
-                  <i class="material-icons md-18 align-middle">add_circle_outline</i>
-                  <span class="align-middle">Add Supplier</span>
-                </a>`);
-    </script>
 </body>
 {% endblock content %}

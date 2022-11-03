@@ -60,7 +60,7 @@
                                     aria-controls="settings">Change Password</a>
                             </li>
                             
-                            {% if request.user.user_type == 'supplier' %}
+                            {% if request.user.user_type == 'SUPPLIER' %}
                             <li class="nav-item">
                                 <a class="nav-link" id="billing-tab" data-toggle="tab" href="#billing" role="tab"
                                 aria-controls="billing">Supplier Details</a>
@@ -227,7 +227,7 @@
                                 </div>
                             </div>
                             
-                            {% if request.user.user_type == 'supplier' %}
+                            {% if request.user.user_type == 'SUPPLIER' %}
                             <div class="tab-pane fade" id="billing" role="tabpanel" aria-labelledby="billing-tab">
                                 <div class="row">
                                     <div class="col-lg-8">
@@ -295,7 +295,7 @@
                                                         <label>Payment Account</label>
                                                         <div class="input-group input-group--inline">
                                                             <div class="input-group-addon">
-                                                                <i class="material-icons">attach_money</i>
+                                                                <i class="material-icons">account_balance</i>
                                                             </div>
                                                             <input type="text" class="form-control" name="payment_account" value="{{ supplier.payment_account }}" required>
                                                         </div>

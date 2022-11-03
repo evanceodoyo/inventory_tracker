@@ -1,6 +1,12 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import F
+
+TWO_DAYS = timedelta(days=2)
+TODAY = timezone.now()
 
 
 class CustomUserManager(BaseUserManager):
@@ -38,20 +44,19 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    class UserType(models.TextChoices):
-        SUPPLIER = "SUPPLIER", "Supplier"
-        RETAILER = "RETAILER", "Retailer"
-        CUSTOMER = "CUSTOMER", "Customer"
+    USER_TYPE = (
+        ("SUPPLIER", "Supplier"),
+        ("RETAILER", "Retailer"),
+        ("CUSTOMER", "Customer"),
+    )
 
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField(max_length=255, unique=True)
-    user_type = models.CharField(
-        choices=UserType.choices, default=UserType.CUSTOMER, max_length=10
-    )
+    user_type = models.CharField(choices=USER_TYPE, default="CUSTOMER", max_length=10)
     is_active = models.BooleanField("Active", default=True)
     avatar = models.ImageField(
-        default="accounts/avatars/default.jpeg", upload_to="accounts/avatars"
+        default="avatars/default.png", upload_to="accounts/avatars"
     )
     password = models.CharField(max_length=100, editable=False)
     username = None
@@ -86,9 +91,15 @@ class Supplier(models.Model):
     phone = models.CharField(max_length=13, default="")
     website_url = models.CharField(max_length=255, default="")
     payment_account = models.CharField(max_length=80, default="")
+    created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
+    # Add email
 
     class Meta:
         db_table = "suppliers"
 
     def __str__(self):
         return self.company_name
+
+    def currently_created(self):
+        return Supplier.objects.filter(created__lte=(TODAY - TWO_DAYS))

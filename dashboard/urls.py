@@ -5,6 +5,8 @@ from .views import (
     edit_product,
     activate_deactivate_product,
     add_to_reorder_cart,
+    notifications,
+    place_purchase_order,
     remove_from_cart,
     reorder,
 )
@@ -21,4 +23,6 @@ urlpatterns = [
     path("add-to-purchase-cart/", add_to_reorder_cart, name="add_to_reorder_cart"),
     path("reorder/", reorder, name="reorder"),
     path("remove-from-cart/", remove_from_cart, name="remove_from_cart"),
+    path("place-purchase-order/", place_purchase_order, name="place_purchase_order"),
+    path("notifications/", notifications, name="notifications"),
 ]
