@@ -5,6 +5,7 @@ from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator, Invali
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from payments.views import lipa_na_mpesa_online
+from django.db.models import Q
 
 
 def home(request):
@@ -219,3 +220,39 @@ def payment(request):
 
         request.session["cart"] = {}
         return redirect("home")
+
+
+def search(request):
+    if request.method == "GET":
+        query = request.GET.get("search")
+        if query == "":
+            query = None
+        results = (
+            Product.objects.filter(status=True)
+            .filter(
+                Q(name__icontains=query)
+                | Q(description__icontains=query)
+                | Q(slug__icontains=query)
+                | Q(categories__title__icontains=query)
+                | Q(sku__icontains=query)
+            )
+            .distinct()
+        )
+    page = request.GET.get('page')
+    paginator = Paginator(results, 10)
+    try:
+        results = paginator.page(page)
+    except PageNotAnInteger:
+        results = paginator.page(1)
+    except (EmptyPage, InvalidPage):
+        results = paginator.page(paginator.num_pages)
+
+    return render(
+        request,
+        "search.html",
+        {
+            "results": results,
+            "query": query,
+        },
+    )
+
