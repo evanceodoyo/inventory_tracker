@@ -8,4 +8,5 @@ def global_context_renderer(request):
         "site_name": settings.SITE_NAME,
         "site_icon": "M",
         "notifications": Notification.objects.select_related("product")[:5],
+        "unread_ntfs": Notification.objects.filter(unread=True).count(),
     }

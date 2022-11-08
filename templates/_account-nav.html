@@ -19,10 +19,12 @@
                 <li class="nav-item nav-link">
                     <div class="form-group m-0">
                         <div class="input-group input-group--inline">
+                            <form action="{% url 'search' %}" method="get">
                             <div class="input-group-addon">
                                 <i class="material-icons">search</i>
                             </div>
-                            <input type="text" class="form-control" name="search" placeholder="Search product.." />
+                            <input type="text" class="form-control" name="search" placeholder="Search product.." value="{{ query }}"/>
+                            </form>
                         </div>
                     </div>
                 </li>
@@ -49,9 +51,10 @@
                 </li>
                 <li class="nav-item dropdown notifications d-flex align-self-center align-items-center"
                     id="navbarNotifications">
-                    <a href="#" class="nav-link dropdown-toggle notifications--active" data-toggle="dropdown"
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"
                         aria-expanded="false">
                         <i class="material-icons align-middle">notifications</i>
+                        <span style="color: #25364A;">{{ unread_ntfs }}</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationsDropdown"
                         id="notificationsDropdown">

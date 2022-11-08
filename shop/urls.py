@@ -7,6 +7,7 @@ from .views import (
     add_to_cart,
     cart,
     checkout,
+    search
 )
 
 urlpatterns = [
@@ -17,4 +18,5 @@ urlpatterns = [
     path("clear-cart/", clear_cart, name="clear_cart"),
     path("checkout/", checkout, name="checkout"),
     path("payment/", payment, name="payment"),
+    path("search/", search, name="search"),
 ]

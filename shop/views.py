@@ -227,17 +227,14 @@ def search(request):
         query = request.GET.get("search")
         if query == "":
             query = None
-        results = (
-            Product.objects.filter(status=True)
-            .filter(
+        results = Product.objects.filter(status=True).filter(
                 Q(name__icontains=query)
                 | Q(description__icontains=query)
                 | Q(slug__icontains=query)
                 | Q(categories__title__icontains=query)
                 | Q(sku__icontains=query)
-            )
-            .distinct()
-        )
+            ).distinct()
+
     page = request.GET.get('page')
     paginator = Paginator(results, 10)
     try:
