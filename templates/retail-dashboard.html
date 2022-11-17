@@ -4,6 +4,7 @@
 {% load filters %}
 {% load mathfilters %}
 {% block content %}
+
 <body>
     <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-responsive-width="992px"
         data-has-scrolling-region>
@@ -54,17 +55,7 @@
                                         <option value="2">Nakuru</option>
                                     </select>
                                     <div class="input-group mr-2">
-                                        <div class="input-group-prepend prev-date">
-                                            <span class="input-group-text">
-                                                <i class="material-icons md-18 align-middle">chevron_left</i>
-                                            </span>
-                                        </div>
-                                        <input type="text" class="datepicker-retail form-control">
-                                        <div class="input-group-append next-date">
-                                            <span class="input-group-text">
-                                                <i class="material-icons md-18 align-middle">chevron_right</i>
-                                            </span>
-                                        </div>
+                                        <input type="text" class="datepicker-retail form-control" disabled>
                                     </div>
                                     <a href="{% url 'reorder' %}" class="btn btn btn-success">
                                         <i class="material-icons md-18 align-middle">shopping_cart</i>

@@ -1,4 +1,3 @@
-from email.policy import default
 from django.db import models
 from accounts.models import Supplier
 from shop.models import Product, TimeStampedModel

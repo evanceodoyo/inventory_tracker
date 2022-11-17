@@ -4,7 +4,7 @@ from shop.models import Category, Order, Product, ProductSpecification
 from accounts.decorators import retailer_required
 from django.contrib import messages
 from accounts.models import Supplier
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum
 from django.db import transaction
 from .models import (
     Notification,

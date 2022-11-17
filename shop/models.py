@@ -36,6 +36,7 @@ class Product(TimeStampedModel):
     categories = models.ManyToManyField(Category, related_name="products")
     image = models.ImageField(upload_to="products/images")
     sku = models.CharField(max_length=100)
+    buying_price = models.FloatField(blank=True, null=True)
     old_price = models.FloatField(default=0.0)
     price = models.FloatField()
     quantity = models.PositiveIntegerField(default=1)
@@ -59,6 +60,9 @@ class Product(TimeStampedModel):
 
     def get_products_by_ids(product_ids):  # sourcery skip
         return Product.objects.filter(id__in=product_ids)
+
+    def get_profit(self):
+        return self.price - self.buying_price
 
 
 class ProductSpecification(models.Model):
