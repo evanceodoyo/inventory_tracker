@@ -21,6 +21,7 @@ from django.db.models import F
 def dashboard(request):
     try:
         products = Product.objects.prefetch_related("items_sold").order_by("quantity")
+        balance = Order.objects.aggregate(bal=Sum("amount"))
         page = request.GET.get("page")
         paginator = Paginator(products, 20)
 
@@ -33,7 +34,7 @@ def dashboard(request):
         return render(
             request,
             "retail-dashboard.html",
-            {"page_title": "Retail Dashboard", "products": products},
+            {"page_title": "Retail Dashboard", "products": products, "balance": balance['bal']},
         )
     except Exception as e:
         raise e

@@ -84,7 +84,7 @@ class User(AbstractUser):
 
 class Supplier(models.Model):
     name = models.OneToOneField(User, on_delete=models.CASCADE)
-    company_name = models.CharField(max_length=255)
+    company_name = models.CharField(max_length=255, unique=True)
     registration_number = models.CharField(max_length=100, default="")
     store_location = models.CharField(max_length=200, default="")
     office_location = models.CharField(max_length=200, default="")

@@ -125,10 +125,10 @@
                                     <div class="col-md-6">
                                         <div class="row">
                                             <div class="col">
-                                                <div class="card card-body bg-light mb-3">
+                                                <!-- <div class="card card-body bg-light mb-3">
                                                     <div class="text-muted">Vendor owes</div>
                                                     <div>&dollar;50.00</div>
-                                                </div>
+                                                </div> -->
                                             </div>
                                             <div class="col">
                                                 <div class="card card-body bg-light mb-3">
@@ -153,7 +153,6 @@
                                                     <div>Subtotal</div>
                                                     <div>Ksh {{ ct|floatformat:"0"|intcomma|default_if_none:"0" }}</div>
                                                 </li>
-                                                {% endwith %}
                                                 <!-- <li>
                                                 <div>Tax</div>
                                                 <div>Ksh 0</div>
@@ -168,9 +167,11 @@
                                             <hr>
                                             <div class="d-flex align-items-center justify-content-between">
                                                 <strong>Total:</strong>
-                                                <strong>&dollar;9552</strong>
+                                                <strong>Ksh {{ ct|floatformat:"0"|intcomma|default_if_none:"0" }}</strong>
                                             </div>
                                         </div>
+                                    {% endwith %}
+
                                     </div>
                                 </div>
                                 <h1 class="h4 mb-0">2. Supplier</h1>

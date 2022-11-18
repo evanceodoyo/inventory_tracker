@@ -49,17 +49,12 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="d-md-flex new-order">
-                                    <select class="custom-select mr-2">
-                                        <option selected>Nairobi</option>
-                                        <option value="1">Mombasa</option>
-                                        <option value="2">Nakuru</option>
-                                    </select>
                                     <div class="input-group mr-2">
-                                        <input type="text" class="datepicker-retail form-control" disabled>
+                                        <input type="text" class="datepicker-retail form-control"  value="Total Sales: Ksh {{ balance|floatformat:'0'|intcomma }}" disabled>
                                     </div>
                                     <a href="{% url 'reorder' %}" class="btn btn btn-success">
                                         <i class="material-icons md-18 align-middle">shopping_cart</i>
-                                        <span class="align-middle">New Order</span>
+                                        <span class="align-middle">Proceed to Order</span>
                                     </a>
                                 </div>
                             </div>

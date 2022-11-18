@@ -133,7 +133,7 @@ def profile(request):
             messages.success(request, "Profile update successfull")
             return redirect("profile")
         if usr.user_type == "SUPPLIER":
-            supplier = Supplier.objects.get_or_create(name=usr)
+            supplier = Supplier.objects.get(name=usr)
             products = Product.objects.all()
             context["supplier"] = supplier
             context["products"] = products
@@ -242,7 +242,11 @@ def supplier_update(request):
             supplier.registration_number = registration_number
             supplier.payment_account = payment_account
             supplier.save()
-            # supplier_products = supplier.products.all()
+            if products_supplied:
+                supplier_products = supplier.products.all()
+                supplier_products.delete()
+                for product in products:
+                    ProductSupplier.objects.create(supplier=supplier, product=product)
             # supplier.products.set(products)
             messages.success(request, "Company details updated successfully")
             return redirect("profile")
