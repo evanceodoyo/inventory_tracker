@@ -8,8 +8,8 @@ from payments.models import MpesaPayment
 from . mpesa_credentials import MpesaAccessToken, LipaNaMpesaPassword
 from django.views.decorators.csrf import csrf_exempt
 
-
-def lipa_na_mpesa_online(request, amount, phone):
+@csrf_exempt
+def lipa_na_mpesa_online(request, phone, amount):
     access_token = MpesaAccessToken.validated_mpesa_access_token
     api_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
     headers = {"Authorization": f"Bearer {access_token}"}
