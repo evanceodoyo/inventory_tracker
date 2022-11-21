@@ -63,33 +63,17 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header d-flex align-items-center justify-content-between">
-                                        <h4 class="card-title">Revenue</h4>
+                                        <h4 class="card-title">Sales</h4>
                                         <div>
-                                            <a href="#" class="btn btn-sm btn-white mr-1">
+                                            <a href="myChart/" class="btn btn-sm btn-white mr-1">
                                                 <i class="material-icons md-18 align-middle">import_export</i>
                                                 <small class="align-middle text-uppercase">Export</small>
-                                            </a>
-                                            <a href="#" class="btn btn-sm btn-white">
-                                                <i class="material-icons md-18 align-middle">print</i>
-                                                <small class="align-middle text-uppercase">Print</small>
                                             </a>
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <div class="media align-items-center mb-3">
-                                            <i class="material-icons md-36 text-success mr-2">keyboard_arrow_up</i>
-                                            <div class="media-body">
-                                                <div class="d-flex align-items-center">
-                                                    <span>&dollar;</span>
-                                                    <h4 class="mb-0">108,350.00</h4>
-                                                </div>
-                                                <div class="text-success">
-                                                    +8.3% since last month
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div class="w-100">
-                                            <canvas id="retail-revenue-chart"></canvas>
+                                            <canvas id="myChart"></canvas>
                                         </div>
                                     </div>
                                 </div>
@@ -99,10 +83,6 @@
                                     <div class="card-header d-flex align-items-center justify-content-between">
                                         <h4 class="card-title">Sales</h4>
                                         <div>
-                                            <a href="#" class="btn btn-sm btn-white mr-1">
-                                                <i class="material-icons md-18 align-middle">import_export</i>
-                                                <small class="align-middle text-uppercase">Export</small>
-                                            </a>
                                             <a href="#" class="btn btn-sm btn-white">
                                                 <i class="material-icons md-18 align-middle">print</i>
                                                 <small class="align-middle text-uppercase">Print</small>
@@ -110,20 +90,8 @@
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <div class="media align-items-center mb-3">
-                                            <i class="material-icons md-36 text-danger mr-2">keyboard_arrow_down</i>
-                                            <div class="media-body">
-                                                <div class="d-flex align-items-center">
-                                                    <span>&dollar;</span>
-                                                    <h4 class="mb-0">29,165.50</h4>
-                                                </div>
-                                                <div class="text-danger">
-                                                    -5.5% since last week
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div class="w-100">
-                                            <canvas id="retail-sales-chart"></canvas>
+                                            <canvas id="myChart2"></canvas>
                                         </div>
                                     </div>
                                 </div>
@@ -282,7 +250,6 @@
                                             {% endif %}
                                         </ul>
                                     </nav>
-                                    <div class="text-muted">1-10 of 200 items</div>
                                 </div>
                             </div>
                             {% endif %}
@@ -297,4 +264,54 @@
     </div>
     <!-- // END drawer-layout -->
 </body>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('myChart');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ dates|safe }},
+            datasets: [{
+                label: 'Sales in the last 1 week',
+                fill: false,
+                data: {{ total_sales|safe }},
+                borderWidth: 2,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+
+
+    const ctxx = document.getElementById('myChart2');
+
+    new Chart(ctxx, {
+        type: 'bar',
+        data: {
+            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 {% endblock content %}

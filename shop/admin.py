@@ -39,7 +39,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ["item", "quantity", "order"]
+    list_display = ["item", "quantity", "order", "date_ordered"]
 
 
 class ShippingAddressAdmin(admin.ModelAdmin):

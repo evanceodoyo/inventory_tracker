@@ -4,7 +4,6 @@ from shop.models import Category, Order, Product, ProductSpecification
 from accounts.decorators import retailer_required
 from django.contrib import messages
 from accounts.models import Supplier
-from django.db.models import Sum
 from django.db import transaction
 from .models import (
     Notification,
@@ -14,7 +13,8 @@ from .models import (
     PurchaseOrderPayment,
 )
 
-from django.db.models import F
+from django.db.models import F, Sum,Count
+from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 
 
 @retailer_required
@@ -22,6 +22,14 @@ def dashboard(request):
     try:
         products = Product.objects.prefetch_related("items_sold").order_by("quantity")
         balance = Order.objects.aggregate(bal=Sum("amount"))
+        # Get the total sales per day for the last 7 days.
+        sales = Order.objects.annotate(day=ExtractDay('created'), month=ExtractMonth('created'), year=ExtractYear('created')).values('order_id', 'month', 'day').annotate(total=Sum('amount')).order_by('created')
+        print(sales)
+        total_sales = []
+        dates = []
+        for s in sales:
+            dates.append(f"{s['month']}/{s['day']}")
+            total_sales.append(s["total"])
         page = request.GET.get("page")
         paginator = Paginator(products, 20)
 
@@ -34,7 +42,7 @@ def dashboard(request):
         return render(
             request,
             "retail-dashboard.html",
-            {"page_title": "Retail Dashboard", "products": products, "balance": balance['bal']},
+            {"page_title": "Retail Dashboard", "products": products, "balance": balance['bal'], "dates": dates, "total_sales": total_sales},
         )
     except Exception as e:
         raise e
