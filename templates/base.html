@@ -24,6 +24,7 @@
 
 </head>
 
+{% if not request.user.is_authenticated %}  
 {% if messages %}
 <div class="card-body">
   {% for message in messages %}
@@ -51,6 +52,7 @@
     {% endif %}
   {% endfor %}
 </div>
+{% endif %}
 {% endif %}
   
 {% block content %}

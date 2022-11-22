@@ -87,13 +87,7 @@
                                                 <span class="badge">Ksh {{ item.price|floatformat:"0"|intcomma }}</span>
                                             </td>
                                             <td class="text-center align-middle">
-                                                <select class="custom-select">
-                                                    <option value="1" selected>
-                                                        {{ item|quantity_in_cart:request.session.cart }}
-                                                    </option>
-                                                    <option value="2">2</option>
-                                                    <option value="3">3</option>
-                                                </select>
+                                                <span class="badge">{{ item|quantity_in_cart:request.session.cart }}</span>
                                             </td>
                                             <td class="text-right align-middle">
                                                 <strong>Ksh {{ item|total_price:request.session.cart|floatformat:"0"|intcomma }}</strong>

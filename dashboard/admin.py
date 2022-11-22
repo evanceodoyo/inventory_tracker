@@ -5,6 +5,7 @@ from .models import (
     PurchaseOrderPayment,
     PurchaseOrderProduct,
     Notification,
+    AccountBalance
 )
 
 
@@ -17,3 +18,4 @@ admin.site.register(PurchaseOrder)
 admin.site.register(PurchaseOrderProduct)
 admin.site.register(PurchaseOrderPayment)
 admin.site.register(Notification, NotificationAdmin)
+admin.site.register(AccountBalance)

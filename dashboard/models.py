@@ -63,7 +63,7 @@ class PurchaseOrderPayment(models.Model):
 
 class PurchaseCartProduct(TimeStampedModel):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 
     class Meta:
@@ -90,3 +90,13 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.message} for {self.product.name}"
+
+
+class AccountBalance(models.Model):
+    balance = models.FloatField(default=0)
+
+    class Meta:
+        db_table ='account_balance'
+
+    def __str__(self):
+        return str(self.balance)

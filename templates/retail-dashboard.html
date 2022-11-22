@@ -50,7 +50,7 @@
                             <div class="col-md-6">
                                 <div class="d-md-flex new-order">
                                     <div class="input-group mr-2">
-                                        <input type="text" class="datepicker-retail form-control"  value="Total Sales: Ksh {{ balance|floatformat:'0'|intcomma }}" disabled>
+                                        <input type="text" class="datepicker-retail form-control"  value="Total Sales: Ksh {{ balance.balance|floatformat:'0'|intcomma }}" disabled>
                                     </div>
                                     <a href="{% url 'reorder' %}" class="btn btn btn-success">
                                         <i class="material-icons md-18 align-middle">shopping_cart</i>

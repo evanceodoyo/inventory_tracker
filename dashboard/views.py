@@ -11,9 +11,10 @@ from .models import (
     PurchaseOrder,
     PurchaseOrderProduct,
     PurchaseOrderPayment,
+    AccountBalance
 )
 
-from django.db.models import F, Sum,Count
+from django.db.models import F, Sum
 from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 
 
@@ -21,14 +22,15 @@ from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 def dashboard(request):
     try:
         products = Product.objects.prefetch_related("items_sold").order_by("quantity")
-        balance = Order.objects.aggregate(bal=Sum("amount"))
+        balance = AccountBalance.objects.get(id=1)
+        
         # Get the total sales per day for the last 7 days.
-        sales = Order.objects.annotate(day=ExtractDay('created'), month=ExtractMonth('created'), year=ExtractYear('created')).values('order_id', 'month', 'day').annotate(total=Sum('amount')).order_by('created')
+        sales = Order.objects.values('order_id').annotate(total=Sum('amount')).order_by('created')
         print(sales)
         total_sales = []
         dates = []
         for s in sales:
-            dates.append(f"{s['month']}/{s['day']}")
+            dates.append(1)
             total_sales.append(s["total"])
         page = request.GET.get("page")
         paginator = Paginator(products, 20)
@@ -42,7 +44,7 @@ def dashboard(request):
         return render(
             request,
             "retail-dashboard.html",
-            {"page_title": "Retail Dashboard", "products": products, "balance": balance['bal'], "dates": dates, "total_sales": total_sales},
+            {"page_title": "Retail Dashboard", "products": products, "balance": balance, "dates": dates, "total_sales": total_sales},
         )
     except Exception as e:
         raise e
@@ -121,7 +123,7 @@ def add_to_reorder_cart(request):
     if request.method == "POST":
         product = get_object_or_404(Product, id=request.POST.get("product_id"))
         if not PurchaseCartProduct.objects.filter(product=product).exists():
-            prd = PurchaseCartProduct.objects.create(user=request.user, product=product)
+            PurchaseCartProduct.objects.create(user=request.user, product=product)
             messages.success(
                 request, f"{product.name} added to purchase cart successfully."
             )
@@ -130,14 +132,20 @@ def add_to_reorder_cart(request):
     return redirect("dashboard")
 
 
-def recommend_suppliers(cart_products):
-    rms = cart_products.annotate()
+def recommend_suppliers(cart_products, suppliers):
+    """
+    Recommend a supplier only if all the products in 
+    cart are supplied by the supplier.
+    """
+    cart_products_ids = cart_products.values_list('product_id', flat=True).distinct()
+    return [s for s in suppliers if all(id in s.products.values_list('product_id', flat=True) for id in cart_products_ids)]
 
-
+@retailer_required
 def reorder(request):
     cart_products = PurchaseCartProduct.objects.select_related("product")
     suppliers = Supplier.objects.all()
-    balance = Order.objects.aggregate(bal=Sum("amount"))
+    balance = AccountBalance.objects.get(id=1)
+   
     if request.method == "POST":
         cart_product = cart_products.get(id=int(request.POST["cart_product"]))
         if "remove" in request.POST:
@@ -161,25 +169,26 @@ def reorder(request):
             "page_title": "Products Reorder",
             "cart_products": cart_products,
             "suppliers": suppliers,
-            "balance": balance["bal"],
+            "recommended_suppliers": recommend_suppliers(cart_products, suppliers),
+            "balance": balance,
         },
     )
 
-
+@retailer_required
 def remove_from_cart(request):
     if request.method == "POST":
-        product = get_object_or_404(PurchaseCartProduct, id=request.POST.get("product"))
-        if product2 := get_object_or_404(
-            PurchaseCartProduct, product_id=int(request.POST.get("product_id"))
-        ):
-            product2.delete()
-            return redirect("dashboard")
-        else:
-            product.delete()
+        if p_id := request.POST.get("product"):
+            cart_product = get_object_or_404(PurchaseCartProduct, id=p_id)
+            cart_product.delete()
             return redirect("reorder")
+        elif prdct_id := request.POST.get("product_id"):
+            cart_product2 = get_object_or_404(PurchaseCartProduct, product_id=prdct_id)
+            cart_product2.delete()
+            return redirect("dashboard")
+            
     return redirect("reorder")
 
-
+@retailer_required
 @transaction.atomic
 def place_purchase_order(request):
     if cart_products := PurchaseCartProduct.objects.select_related("product"):
@@ -188,32 +197,39 @@ def place_purchase_order(request):
             order_notes = request.POST.get("order_notes")
             supplier = request.POST.get("supplier")
             # pay_agreement = request.POST.get('pay_agreement')
+            bal = AccountBalance.objects.get(id=1)
             purchase_order = PurchaseOrder(
                 user=request.user,
                 amount=total,
                 supplier=supplier,
                 order_notes=order_notes,
             )
-            purchase_order.save()
-            PurchaseOrderPayment.objects.create(
-                purchase_order=purchase_order, amount=purchase_order.amount
-            )
-
-            for p in cart_products.select_for_update():
-                PurchaseOrderProduct.objects.create(
-                    supplier=supplier,
-                    purchase_order=purchase_order,
-                    product=p.product,
-                    quantity=p.quantity,
+            if bal.balance < purchase_order.amount:
+                messages.info(request, "Account balance too low. Order not placed.")
+            else:
+                purchase_order.save()
+                PurchaseOrderPayment.objects.create(
+                    purchase_order=purchase_order, amount=purchase_order.amount
                 )
-                p.delete()
-            messages.success(request, "Purchase order placed successfully.")
+                bal.balance = F('balance') - purchase_order.amount
+                bal.save()
+
+                for p in cart_products.select_for_update():
+                    PurchaseOrderProduct.objects.create(
+                        supplier=supplier,
+                        purchase_order=purchase_order,
+                        product=p.product,
+                        quantity=p.quantity,
+                    )
+                    p.delete()
+                messages.success(request, "Purchase order placed successfully.")
+            return redirect("reorder")
     else:
         messages.success(request, "No products in cart to reorder")
 
     return redirect("dashboard")
 
-
+@retailer_required
 def notifications(request):
     notifications = Notification.objects.select_related("product").order_by(
         "-created", "-unread"

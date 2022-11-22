@@ -135,7 +135,7 @@
                                                     <div class="d-flex align-items-center justify-content-between">
                                                         <div>
                                                             <div class="text-muted">In Credit</div>
-                                                            <div>Ksh {{ balance|floatformat:"0"|intcomma }}</div>
+                                                            <div>Ksh {{ balance.balance|floatformat:"0"|intcomma }}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -181,8 +181,10 @@
                                         <div class="form-group">
                                             <label for="supplier">Recommended Suppliers</label>
                                             <select class="form-control" required>
-                                                {% for supplier in suppliers %}
-                                                <option value="{{ supplier.id }}">{{ supplier.company_name }}</option>
+                                                {% for s in recommended_suppliers %}
+                                                <option value="{{ supplier.id }}" selected>{{ s.company_name }}</option>
+                                                {% empty %}
+                                                <option value="" disabled>No recommend supplier. Consider splitting the order.</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -191,8 +193,10 @@
                                         <div class="form-group">
                                             <label for="supplier">All Suppliers</label>
                                             <select class="form-control">
-                                                <option value="2">Seattle Store</option>
-                                                <option value="3">Washington Store</option>
+                                                <option value="" disabled selected>All Suppliers</option>
+                                                {% for s in suppliers %}
+                                                <option disabled>{{ s.company_name }}</option>
+                                                {% endfor %}
                                             </select>
                                         </div>
                                     </div>

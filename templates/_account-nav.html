@@ -9,7 +9,34 @@
                 <a href="{% url 'home' %}" class="page-title m-0">{{ site_name }}</a>
             </div>
         </div>
-
+        {% if messages %}
+        <div class="card-body">
+            {% for message in messages %}
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+            <div class="alert alert-success alert-dismissable fade show text-center" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+            <div class="alert alert-danger alert-dismissable fade show text-center" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+            <div class="alert alert-primary alert-dismissable fade show text-center" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
         <button class="btn btn-link text-white pl-0 d-md-none" type="button" data-toggle="sidebar">
             <i class="material-icons align-middle md-36">short_text</i>
         </button>

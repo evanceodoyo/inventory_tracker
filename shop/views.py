@@ -5,7 +5,8 @@ from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator, Invali
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from payments.views import lipa_na_mpesa_online
-from django.db.models import Q
+from django.db.models import Q, F
+from dashboard.models import AccountBalance
 
 
 def home(request):
@@ -200,7 +201,9 @@ def payment(request):
             shipping_address=user.shipping_address.first(),
         )
         order.save()
-
+        bal = AccountBalance.objects.get(id=1)
+        bal.balance = F('balance') + order.amount
+        bal.save()
         # use select_for_update() to obtain a lock on the items
         # and avoiding race conditions.
         for item in order_items.select_for_update():
