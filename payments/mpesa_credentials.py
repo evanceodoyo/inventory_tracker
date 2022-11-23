@@ -20,7 +20,7 @@ class MpesaAccessToken:
         ),
     )
     mpesa_access_token = json.loads(response.text)
-    print(mpesa_access_token, "0000000000000000000000000000")
+    print(mpesa_access_token, "MPesa Token")
     validated_mpesa_access_token = mpesa_access_token["access_token"]
 
 
