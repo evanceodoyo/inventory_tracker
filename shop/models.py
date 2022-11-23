@@ -58,7 +58,7 @@ class Product(TimeStampedModel):
         if self.old_price > self.price:
             return (self.old_price - self.price) / self.old_price * 100
 
-    def get_products_by_ids(product_ids):  # sourcery skip
+    def get_products_by_ids(product_ids):
         return Product.objects.filter(id__in=product_ids)
 
     def get_profit(self):
