@@ -23,6 +23,7 @@ class MpesaAccessToken:
     print(mpesa_access_token, "0000000000000000000000000000")
     validated_mpesa_access_token = mpesa_access_token["access_token"]
 
+
 class LipaNaMpesaPassword:
     lipa_time = datetime.now().strftime("%Y%m%d%H%M%S")
     business_short_code = config("BUSINESS_SHORT_CODE")

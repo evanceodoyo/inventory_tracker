@@ -5,7 +5,7 @@ from .models import (
     PurchaseOrderPayment,
     PurchaseOrderProduct,
     Notification,
-    AccountBalance
+    AccountBalance,
 )
 
 

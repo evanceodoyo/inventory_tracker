@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<body>
+    <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-responsive-width="992px"
+        data-has-scrolling-region>
+
+        <div class="mdk-drawer-layout__content">
+            <!-- header-layout -->
+            <div
+                class="mdk-header-layout js-mdk-header-layout  mdk-header--fixed  mdk-header-layout__content--scrollable">
+                <!-- header -->
+                <div class="mdk-header js-mdk-header bg-primary" data-fixed>
+                    <div class="mdk-header__content">
+                        {% include '_account-nav.html' %}
+                    </div>
+                </div>
+
+                <!-- content -->
+                <div class="mdk-header-layout__content top-navbar mdk-header-layout__content--scrollable h-100">
+                    <!-- main content -->
+                    <div class="container-fluid">
+                        <h4>Supplier List</h4>
+                        <div class="card">
+                            <div class="card-body">
+                                <ul class="list-group mb-3">
+                                    {% for s in suppliers %}
+                                    <li class="list-group-item">
+                                        <div class="media align-items-center">
+                                            <img src="{{ s.name.avatar.url }}" alt="company owner image"
+                                                width="40" class="rounded-circle mr-2">
+                                            <div class="media-body">
+                                                <div>
+                                                    <h5>{{ s.company_name }}</h5>
+                                                </div>
+                                                <div class="mb-2">
+                                                    Supplies:
+                                                    <ul>
+                                                        {% for p in s.products.all %}
+                                                        <li style="list-style: none;" ><a href="{{ p.product.get_absolute_url }}">{{ p.product.name }}</a></li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- // END drawer-layout__content -->
+    </div>
+    <!-- // END drawer-layout -->
+</body>
+{% endblock content %}

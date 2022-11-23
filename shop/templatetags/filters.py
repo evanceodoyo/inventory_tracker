@@ -46,7 +46,6 @@ def quantity_sold(product):
     item = OrderItem.objects.filter(item_id=product.id).aggregate(
         qty_sold=Sum("quantity")
     )
-    # print(item)
     return item["qty_sold"]
 
 

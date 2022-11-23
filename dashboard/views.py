@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator, InvalidPage
-from shop.models import Category, Order, Product, ProductSpecification
+from shop.models import Category, Order, OrderItem, Product, ProductSpecification
 from accounts.decorators import retailer_required
 from django.contrib import messages
 from accounts.models import Supplier
@@ -11,11 +11,11 @@ from .models import (
     PurchaseOrder,
     PurchaseOrderProduct,
     PurchaseOrderPayment,
-    AccountBalance
+    AccountBalance,
 )
-
+from shop.models import ProductSupplier
 from django.db.models import F, Sum
-from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
+from datetime import timedelta, datetime
 
 
 @retailer_required
@@ -23,15 +23,27 @@ def dashboard(request):
     try:
         products = Product.objects.prefetch_related("items_sold").order_by("quantity")
         balance = AccountBalance.objects.get(id=1)
-        
-        # Get the total sales per day for the last 7 days.
-        sales = Order.objects.values('order_id').annotate(total=Sum('amount')).order_by('created')
-        print(sales)
+
+        # Get the total sales per day for the last 7 days
+        # when sales were made. Assume days with zero sales.
+        sales = Order.objects.values("date_created").annotate(total=Sum("amount"))[:7]
         total_sales = []
         dates = []
         for s in sales:
-            dates.append(1)
             total_sales.append(s["total"])
+            dates.append(s["date_created"].strftime("%d/%m/%Y"))
+        most_sold_products = (
+            OrderItem.objects.filter(
+                date_ordered__gte=datetime.now() - timedelta(days=7)
+            )
+            .values("item", "item__name")
+            .annotate(qty=Sum("quantity"))
+        )
+        quantities = []
+        prdcts = []
+        for p in most_sold_products:
+            prdcts.append(p["item__name"])
+            quantities.append(p["qty"])
         page = request.GET.get("page")
         paginator = Paginator(products, 20)
 
@@ -44,7 +56,15 @@ def dashboard(request):
         return render(
             request,
             "retail-dashboard.html",
-            {"page_title": "Retail Dashboard", "products": products, "balance": balance, "dates": dates, "total_sales": total_sales},
+            {
+                "page_title": "Retail Dashboard",
+                "products": products,
+                "balance": balance,
+                "dates": dates,
+                "total_sales": total_sales,
+                "prdcts": prdcts,
+                "quantities": quantities,
+            },
         )
     except Exception as e:
         raise e
@@ -134,18 +154,26 @@ def add_to_reorder_cart(request):
 
 def recommend_suppliers(cart_products, suppliers):
     """
-    Recommend a supplier only if all the products in 
+    Recommend a supplier only if all the products in
     cart are supplied by the supplier.
     """
-    cart_products_ids = cart_products.values_list('product_id', flat=True).distinct()
-    return [s for s in suppliers if all(id in s.products.values_list('product_id', flat=True) for id in cart_products_ids)]
+    cart_products_ids = cart_products.values_list("product_id", flat=True).distinct()
+    return [
+        s
+        for s in suppliers
+        if all(
+            id in s.products.values_list("product_id", flat=True)
+            for id in cart_products_ids
+        )
+    ]
+
 
 @retailer_required
 def reorder(request):
     cart_products = PurchaseCartProduct.objects.select_related("product")
     suppliers = Supplier.objects.all()
     balance = AccountBalance.objects.get(id=1)
-   
+
     if request.method == "POST":
         cart_product = cart_products.get(id=int(request.POST["cart_product"]))
         if "remove" in request.POST:
@@ -174,6 +202,7 @@ def reorder(request):
         },
     )
 
+
 @retailer_required
 def remove_from_cart(request):
     if request.method == "POST":
@@ -185,8 +214,9 @@ def remove_from_cart(request):
             cart_product2 = get_object_or_404(PurchaseCartProduct, product_id=prdct_id)
             cart_product2.delete()
             return redirect("dashboard")
-            
+
     return redirect("reorder")
+
 
 @retailer_required
 @transaction.atomic
@@ -195,7 +225,7 @@ def place_purchase_order(request):
         total = sum((p.quantity * p.product.price) for p in cart_products)
         if request.method == "POST":
             order_notes = request.POST.get("order_notes")
-            supplier = request.POST.get("supplier")
+            supplier = get_object_or_404(Supplier, id=request.POST.get("supplier"))
             # pay_agreement = request.POST.get('pay_agreement')
             bal = AccountBalance.objects.get(id=1)
             purchase_order = PurchaseOrder(
@@ -211,7 +241,7 @@ def place_purchase_order(request):
                 PurchaseOrderPayment.objects.create(
                     purchase_order=purchase_order, amount=purchase_order.amount
                 )
-                bal.balance = F('balance') - purchase_order.amount
+                bal.balance = F("balance") - purchase_order.amount
                 bal.save()
 
                 for p in cart_products.select_for_update():
@@ -229,12 +259,19 @@ def place_purchase_order(request):
 
     return redirect("dashboard")
 
+
 @retailer_required
 def notifications(request):
     notifications = Notification.objects.select_related("product").order_by(
         "-created", "-unread"
     )
     products = Product.objects.filter(notification_sent=False).order_by("quantity")[:15]
+    suppliers = (
+        ProductSupplier.objects.select_related("supplier")
+        .values("supplier__company_name")
+        .order_by("date_signed")
+        .distinct()[:8]
+    )
     if request.method == "POST":
         notification = get_object_or_404(
             Notification, id=request.POST.get("notification_id")
@@ -256,5 +293,18 @@ def notifications(request):
             "page_title": "Notifications",
             "notifications": notifications,
             "products": products,
+            "suppliers": suppliers,
         },
     )
+
+
+def suppliers(request):
+    """
+    List suppliers who have updated their
+    profiles to supply certain products.
+    """
+    suppliers_ids = ProductSupplier.objects.values_list(
+        "supplier_id", flat=True
+    ).distinct()
+    suppliers = Supplier.objects.select_related("name").filter(id__in=suppliers_ids)
+    return render(request, "supplier-list.html", {"suppliers": suppliers})

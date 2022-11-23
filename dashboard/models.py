@@ -96,7 +96,7 @@ class AccountBalance(models.Model):
     balance = models.FloatField(default=0)
 
     class Meta:
-        db_table ='account_balance'
+        db_table = "account_balance"
 
     def __str__(self):
         return str(self.balance)

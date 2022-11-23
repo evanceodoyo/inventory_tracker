@@ -50,7 +50,7 @@
                             <div class="col-md-6">
                                 <div class="d-md-flex new-order">
                                     <div class="input-group mr-2">
-                                        <input type="text" class="datepicker-retail form-control"  value="Total Sales: Ksh {{ balance.balance|floatformat:'0'|intcomma }}" disabled>
+                                        <input type="text" class="datepicker-retail form-control"  value="Acccount Balance: Ksh {{ balance.balance|floatformat:'0'|intcomma }}" disabled>
                                     </div>
                                     <a href="{% url 'reorder' %}" class="btn btn btn-success">
                                         <i class="material-icons md-18 align-middle">shopping_cart</i>
@@ -64,12 +64,6 @@
                                 <div class="card">
                                     <div class="card-header d-flex align-items-center justify-content-between">
                                         <h4 class="card-title">Sales</h4>
-                                        <div>
-                                            <a href="myChart/" class="btn btn-sm btn-white mr-1">
-                                                <i class="material-icons md-18 align-middle">import_export</i>
-                                                <small class="align-middle text-uppercase">Export</small>
-                                            </a>
-                                        </div>
                                     </div>
                                     <div class="card-body">
                                         <div class="w-100">
@@ -81,13 +75,7 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header d-flex align-items-center justify-content-between">
-                                        <h4 class="card-title">Sales</h4>
-                                        <div>
-                                            <a href="#" class="btn btn-sm btn-white">
-                                                <i class="material-icons md-18 align-middle">print</i>
-                                                <small class="align-middle text-uppercase">Print</small>
-                                            </a>
-                                        </div>
+                                        <h4 class="card-title">Most Sold Products</h4>
                                     </div>
                                     <div class="card-body">
                                         <div class="w-100">
@@ -102,18 +90,20 @@
                                 <table class="table m-0">
                                     <thead>
                                         <tr class="bg-fade">
-                                            <th style="width: 80px;">
+                                            <!-- <th style="width: 80px;">
                                                 <div class="custom-control custom-checkbox">
                                                     <input type="checkbox" class="custom-control-input check-sales"
                                                         id="saleCheckAll">
                                                     <label class="custom-control-label align-middle"
                                                         for="saleCheckAll"></label>
                                                 </div>
-                                            </th>
+                                            </th> -->
                                             <th>Product</th>
                                             <th>In Stock</th>
                                             <th>Sold</th>
-                                            <th>Price(Ksh)</th>
+                                            <th>B.P(Ksh)</th>
+                                            <th>S.P(Ksh)</th>
+                                            <th>Profit(Ksh)</th>
                                             <th>Revenue(Ksh)</th>
                                             <th style="width: 150px;">Status</th>
                                             <th></th>
@@ -123,14 +113,14 @@
                                         
                                         {% for product in products %}
                                         <tr>
-                                            <td class="align-middle">
+                                            <!-- <td class="align-middle">
                                                 <div class="custom-control custom-checkbox">
                                                     <input type="checkbox" class="custom-control-input sale"
                                                         id="saleCheck1">
                                                     <label class="custom-control-label align-middle"
                                                         for="saleCheck1"></label>
                                                 </div>
-                                            </td>
+                                            </td> -->
                                             <td class="align-middle">
                                                 <div class="media align-items-center">
                                                     <a href="{{ product.get_absolute_url }}">
@@ -144,12 +134,14 @@
                                             </td>
                                             <td class="align-middle">{{ product.quantity }}</td>
                                             <td class="align-middle">{{ product|quantity_sold|default_if_none:"0" }}</td>
+                                            <td class="align-middle">{{ product.buying_price|floatformat:"0"|intcomma }}</td>
                                             <td class="align-middle">{{ product.price|floatformat:"0"|intcomma }}</td>
+                                            <td class="align-middle">{{ product|quantity_sold|mul:product.get_profit|floatformat:"0"|intcomma }}</td>
                                             <td class="align-middle">{{ product|quantity_sold|mul:product.price|floatformat:"0"|intcomma|default:"0" }}</td>
                                             <td>
                                                 
                                                 {% with pq=product.quantity prl=product.reorder_level  %}
-                                                    {% if pq > prl|add:"30" %}
+                                                    {% if pq > prl|add:"20" %}
                                                     <div class="badge badge-success">STOCKED</div>
                                                     {% elif pq > prl %}
                                                     <div class="badge badge-primary">CONSIDER RESTOCKING</div>
@@ -298,10 +290,10 @@
     new Chart(ctxx, {
         type: 'bar',
         data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: {{ prdcts|safe }},
             datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
+                label: 'Most Sold Products',
+                data: {{ quantities|safe }},
                 borderWidth: 2
             }]
         },

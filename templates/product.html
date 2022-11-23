@@ -122,69 +122,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <h4 class="mb-0">Product Reviews</h4>
-                        <hr />
-                        <div class="row">
-                            <!-- for goes here -->
-                            <div class="col-lg-4">
-                                <div class="card card-review">
-                                    <div class="card-body">
-                                        <div class="media align-items-center">
-                                            <img src="assets/images/avatars/person-1.jpg" alt="Andrew Robles"
-                                                class="rounded-circle mr-2" width="35" />
-                                            <div class="media-body">
-                                                <div>
-                                                    Andrew Robles
-                                                    <small>said</small>
-                                                </div>
-                                                <div class="text-muted">
-                                                    This is a great product!
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <span class="text-muted">1 day ago</span>
-                                            <div>
-                                                <i class="material-icons md-18 align-middle text-warning">star</i>
-                                                <i class="material-icons md-18 align-middle text-warning">star</i>
-                                                <i class="material-icons md-18 align-middle text-warning">star</i>
-                                                <i class="material-icons md-18 align-middle text-warning">star</i>
-                                                <i class="material-icons md-18 align-middle text-warning">star_half</i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- for ends here -->
-                        </div>
-
-                        <h4 class="mb-0">People were also interested in</h4>
-                        <hr />
-
-                        <div class="owl-carousel owl-theme">
-
-
-                            {% for product in related_products %}
-                            <div class="card card-product">
-                                <a href="{{ product.get_absolute_url }}">
-                                    <img src="{{ product.image.url }}" alt="product image" class="card-img-top" width="100"/>
-                                </a>
-                                <div class="card-body">
-                                    <a href="{{ product.get_absolute_url }}" class="h4 text-primary-dark mb-0">{{ product.name }}</a>
-                                    <p class="card-text">
-                                        {{ product.description|truncatewords:"15"}}
-                                    </p>
-                                    <div class="lead text-primary">
-                                        Ksh {{ product.price|floatformat:"0"|intcomma }}
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-
-                        </div>
                     </div>
                 </div>
             </div>

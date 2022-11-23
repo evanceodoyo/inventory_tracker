@@ -9,6 +9,7 @@ from .views import (
     place_purchase_order,
     remove_from_cart,
     reorder,
+    suppliers,
 )
 
 urlpatterns = [
@@ -25,4 +26,5 @@ urlpatterns = [
     path("remove-from-cart/", remove_from_cart, name="remove_from_cart"),
     path("place-purchase-order/", place_purchase_order, name="place_purchase_order"),
     path("notifications/", notifications, name="notifications"),
+    path("suppliers/", suppliers, name="suppliers"),
 ]

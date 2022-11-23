@@ -94,7 +94,7 @@ class ShippingAddress(TimeStampedModel):
         return f"Shipping address for {self.customer}."
 
 
-class Order(TimeStampedModel):
+class Order(models.Model):
     ORDER_STATUS = (
         ("PENDING", "Pending"),
         ("AWAITING SHIPMENT", "Awaiting Shipment"),
@@ -112,6 +112,9 @@ class Order(TimeStampedModel):
     shipping_address = models.ForeignKey(
         ShippingAddress, on_delete=models.SET_NULL, null=True
     )
+    date_created = models.DateField(auto_now_add=True, null=True)
+    time_created = models.TimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "orders"
@@ -166,6 +169,8 @@ class ProductSupplier(models.Model):
     supplier = models.ForeignKey(
         Supplier, on_delete=models.CASCADE, related_name="products"
     )
+    date_signed = models.DateTimeField(auto_now_add=True, null=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "product_suppliers"

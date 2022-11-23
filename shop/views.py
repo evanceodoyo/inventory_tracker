@@ -13,13 +13,20 @@ def home(request):
     try:
         categories = Category.objects.all()
         page = request.GET.get("page")
+        sort_by = request.GET.get("sort_by")
         if category := request.GET.get("category"):
             products = Product.objects.filter(
                 categories__slug__in=[category], status=True
             )
         else:
             products = Product.objects.filter(status=True)
-        paginator = Paginator(products, 15)
+            if sort_by == "price_low":
+                products = products.order_by("price")
+            elif sort_by == "price_high":
+                products = products.order_by("-price")
+            elif sort_by == "most_recent":
+                products = products.order_by("-created")
+        paginator = Paginator(products, 20)
         try:
             products = paginator.page(page)
         except EmptyPage:
@@ -190,7 +197,7 @@ def payment(request):
         messages.info(request, "Please add items to your cart")
         return redirect("home")
     if request.method == "POST":
-        phone = request.POST.get("phone")
+        phone = phone_sanitize(request.POST.get("phone"))
         user = request.user
         cart = request.session.get("cart")
         order_items = Product.get_products_by_ids(list(cart.keys()))
@@ -202,7 +209,7 @@ def payment(request):
         )
         order.save()
         bal = AccountBalance.objects.get(id=1)
-        bal.balance = F('balance') + order.amount
+        bal.balance = F("balance") + order.amount
         bal.save()
         # use select_for_update() to obtain a lock on the items
         # and avoiding race conditions.
@@ -230,15 +237,20 @@ def search(request):
         query = request.GET.get("search")
         if query == "":
             query = None
-        results = Product.objects.filter(status=True).filter(
+        results = (
+            Product.objects.filter(status=True)
+            .filter(
                 Q(name__icontains=query)
                 | Q(description__icontains=query)
                 | Q(slug__icontains=query)
                 | Q(categories__title__icontains=query)
                 | Q(sku__icontains=query)
-            ).distinct()
+            )
+            .order_by("-created")
+            .distinct()
+        )
 
-    page = request.GET.get('page')
+    page = request.GET.get("page")
     paginator = Paginator(results, 10)
     try:
         results = paginator.page(page)
@@ -256,3 +268,14 @@ def search(request):
         },
     )
 
+
+def phone_sanitize(phone):
+    if phone.startswith("0"):
+        phone = phone.replace("0", "254", 1)
+    elif phone.startswith("+254"):
+        phone = phone.replace("+254", "254")
+    elif phone.startswith("+1"):
+        phone = phone.replace("+1", "254")
+    elif phone.startswith("7"):
+        phone = phone.replace("7", "2547", 1)
+    return phone

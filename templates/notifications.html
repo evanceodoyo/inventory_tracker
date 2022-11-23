@@ -2,13 +2,15 @@
 {% load static %}
 {% load humanize %}
 {% block content %}
+
 <body>
     <div class="mdk-drawer-layout js-mdk-drawer-layout" data-fullbleed data-push data-responsive-width="992px"
         data-has-scrolling-region>
 
         <div class="mdk-drawer-layout__content">
             <!-- header-layout -->
-            <div class="mdk-header-layout js-mdk-header-layout  mdk-header--fixed  mdk-header-layout__content--scrollable">
+            <div
+                class="mdk-header-layout js-mdk-header-layout  mdk-header--fixed  mdk-header-layout__content--scrollable">
                 <!-- header -->
                 {% include '_account-nav.html' %}
                 <!-- content -->
@@ -24,19 +26,21 @@
                                                 <p class="lead mb-0">Currently Signed Suppliers</p>
                                             </div>
                                         </div>
-                                        {% for i in l %}
-                                        <li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
-                                        <p class="card-text">I want to talk about two things that are quite important..
-                                            <a href="#">read more</a>
-                                        </p>
+                                        {% for s in suppliers %}
+                                        <li
+                                            class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+                                            <p class="card-text">{{ s.supplier__company_name }}</p>
                                         </li>
                                         {% endfor %}
+                                        <p class="card-text">
+                                            <a href="{% url 'suppliers' %}">View All Suppliers</a>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
-                                {% for n in notifications %}                                    
+                                {% for n in notifications %}
                                 <div class="card card-profile--activity">
                                     <div class="card-body">
                                         <div class="media align-items-center">
@@ -49,11 +53,11 @@
                                                 <p class="card-text text-muted">
                                                     {{ n.created|naturaltime }}
                                                     <span>
-                                                    {% if n.unread %}
+                                                        {% if n.unread %}
                                                         <span class="badge badge-primary">Unread</span>
-                                                    {% else %}
+                                                        {% else %}
                                                         <span class="badge badge-success">Read</span>
-                                                    {% endif %}
+                                                        {% endif %}
                                                     </span>
                                                 </p>
                                             </div>
@@ -66,7 +70,8 @@
                                                     {% csrf_token %}
                                                     <input type="hidden" value="{{ n.id }}" name="notification_id">
                                                     <button class="dropdown-item" name="read">Mark As Read</button>
-                                                    <button class="dropdown-item" name="delete" style="color: red;">Delete</button>
+                                                    <button class="dropdown-item" name="delete"
+                                                        style="color: red;">Delete</button>
                                                 </form>
                                             </div>
                                         </div>
@@ -82,16 +87,18 @@
                                 <div class="card">
                                     <div class="card-header d-flex align-items-center justify-content-between">
                                         <div class="card-title">Products Soon Reaching Reorder Level</div>
-                                        <a href="{% url 'notifications' %}" data-toggle="tooltip" data-placement="bottom" title="Refresh">
+                                        <a href="{% url 'notifications' %}" data-toggle="tooltip"
+                                            data-placement="bottom" title="Refresh">
                                             <i class="material-icons align-middle md-18 text-muted">sync</i>
                                         </a>
                                     </div>
                                     <ul class="list-group list-group-flush">
                                         {% for product in products %}
-                                        <li class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+                                        <li
+                                            class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
                                             <div class="media align-items-center">
-                                                <img src="{{ product.image.url }}"
-                                                    class="img-fluid rounded-circle mr-1" width="35" alt="product image">
+                                                <img src="{{ product.image.url }}" class="img-fluid rounded-circle mr-1"
+                                                    width="35" alt="product image">
                                                 <div class="media-body lh-1">
                                                     <a href="{% url 'edit_product' product.slug %}">{{ product.name }}</a>
                                                     <div>
@@ -103,20 +110,6 @@
                                         {% endfor %}
                                     </ul>
                                 </div>
-                                
-                                {% for i in l %}
-                                <div class="card">
-                                    <div class="p-2">
-                                        <div class="d-flex align-items-center">
-                                            <div class="author-info lh-1">
-                                                <p class="mb-0">MarketPro</p>
-                                                <small class="text-muted">Marketing</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-
                             </div>
                         </div>
                     </div>
@@ -126,6 +119,6 @@
         <!-- // END drawer-layout__content -->
     </div>
     <!-- // END drawer-layout -->
-    
+
 </body>
 {% endblock content %}

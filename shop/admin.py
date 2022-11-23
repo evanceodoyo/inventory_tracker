@@ -35,7 +35,14 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["order_id", "customer", "amount", "created", "status"]
+    list_display = [
+        "order_id",
+        "customer",
+        "amount",
+        "date_created",
+        "time_created",
+        "status",
+    ]
 
 
 class OrderItemAdmin(admin.ModelAdmin):

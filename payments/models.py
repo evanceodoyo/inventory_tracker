@@ -2,6 +2,7 @@ from django.db import models
 
 from shop.models import Order
 
+
 class MpesaPayment(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
@@ -15,7 +16,7 @@ class MpesaPayment(models.Model):
     organization_balance = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
-        db_table = 'mpesa_payments'
+        db_table = "mpesa_payments"
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}, Amount: {self.amount}'
+        return f"{self.first_name} {self.last_name}, Amount: {self.amount}"

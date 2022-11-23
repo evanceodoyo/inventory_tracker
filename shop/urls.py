@@ -7,7 +7,7 @@ from .views import (
     add_to_cart,
     cart,
     checkout,
-    search
+    search,
 )
 
 urlpatterns = [

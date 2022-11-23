@@ -179,10 +179,13 @@
                                 <div class="row">
                                     <div class="col">
                                         <div class="form-group">
-                                            <label for="supplier">Recommended Suppliers</label>
-                                            <select class="form-control" required>
+                                            <label for="recommended_supplier">Recommended Suppliers</label>
+                                            <select class="form-control" name="supplier" required>
                                                 {% for s in recommended_suppliers %}
-                                                <option value="{{ supplier.id }}" selected>{{ s.company_name }}</option>
+                                                    {% if forloop.first %}
+                                                    <option value="{{ s.id }}" selected>{{ s.company_name }}</option>
+                                                    {% endif %}
+                                                    <option value="{{ s.id }}">{{ s.company_name }}</option>
                                                 {% empty %}
                                                 <option value="" disabled>No recommend supplier. Consider splitting the order.</option>
                                                 {% endfor %}
