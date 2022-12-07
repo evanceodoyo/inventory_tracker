@@ -251,6 +251,11 @@ def place_purchase_order(request):
                         product=p.product,
                         quantity=p.quantity,
                     )
+                    # Adjust the product quantity to
+                    # simulate product delivery
+                    prdct = Product.objects.get(pk=p.product_id)
+                    prdct.quantity = p.quantity
+                    prdct.save()
                     p.delete()
                 messages.success(request, "Purchase order placed successfully.")
             return redirect("reorder")
