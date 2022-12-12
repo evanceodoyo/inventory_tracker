@@ -73,8 +73,6 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.email}"
 
-    # def get_absolute_url(self):
-    #     return reverse("team_detail", args=[self.username])
     def get_fullname(self):
         return f"{self.first_name} {self.last_name}"
 
@@ -84,6 +82,7 @@ class User(AbstractUser):
 
 class Supplier(models.Model):
     name = models.OneToOneField(User, on_delete=models.CASCADE)
+    email = models.EmailField(max_length=200)
     company_name = models.CharField(max_length=255, unique=True)
     registration_number = models.CharField(max_length=100, default="")
     store_location = models.CharField(max_length=200, default="")
@@ -93,7 +92,6 @@ class Supplier(models.Model):
     payment_account = models.CharField(max_length=80, default="")
     created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
-    # Add email
 
     class Meta:
         db_table = "suppliers"
