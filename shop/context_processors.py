@@ -11,7 +11,9 @@ def global_context_renderer(request):
         try:
             fn = notifications.filter(supplier=Supplier.objects.get(name=usr))
         except:
-            supplier  = Supplier.objects.create(name=usr, email=usr.email, company_name=f"{usr.email}'s Company")
+            supplier = Supplier.objects.create(
+                name=usr, email=usr.email, company_name=f"{usr.email}'s Company"
+            )
             fn = notifications.filter(supplier=supplier)
         context["fn"] = fn
         context["s_unread_ntfs"] = fn.filter(unread=True).count()

@@ -276,13 +276,13 @@ def notifications(request):
             supplier=Supplier.objects.get(name=request.user)
         )
         context["filtered_notifications"] = filtered_notifications
-   
+
     products = Product.objects.filter(notification_sent=False).order_by("quantity")[:15]
     suppliers_ids = ProductSupplier.objects.values_list(
         "supplier_id", flat=True
     ).distinct()
-    suppliers = Supplier.objects.filter(id__in=suppliers_ids).order_by('-created')
-    
+    suppliers = Supplier.objects.filter(id__in=suppliers_ids).order_by("-created")
+
     if request.method == "POST":
         notification = get_object_or_404(
             Notification, id=request.POST.get("notification_id")
