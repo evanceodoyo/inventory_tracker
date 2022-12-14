@@ -271,20 +271,18 @@ def notifications(request):
     notifications = Notification.objects.select_related("product", "supplier").order_by(
         "-created", "-unread"
     )
-    try:
+    if request.user.user_type is "SUPPLIER":
         filtered_notifications = notifications.filter(
             supplier=Supplier.objects.get(name=request.user)
         )
         context["filtered_notifications"] = filtered_notifications
-    except Supplier.DoesNotExist:
-        pass
+   
     products = Product.objects.filter(notification_sent=False).order_by("quantity")[:15]
-    suppliers = (
-        ProductSupplier.objects.select_related("supplier")
-        .values("supplier__company_name")
-        .order_by("date_signed")
-        .distinct()[:8]
-    )
+    suppliers_ids = ProductSupplier.objects.values_list(
+        "supplier_id", flat=True
+    ).distinct()
+    suppliers = Supplier.objects.filter(id__in=suppliers_ids).order_by('-created')
+    
     if request.method == "POST":
         notification = get_object_or_404(
             Notification, id=request.POST.get("notification_id")
