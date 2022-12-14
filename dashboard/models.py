@@ -80,6 +80,9 @@ class Notification(models.Model):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="notifications"
     )
+    supplier = models.ForeignKey(
+        Supplier, on_delete=models.CASCADE, null=True, blank=True
+    )
     message = models.CharField(max_length=400)
     unread = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)

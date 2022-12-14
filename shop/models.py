@@ -1,4 +1,3 @@
-from email.policy import default
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -59,7 +58,7 @@ class Product(TimeStampedModel):
             return (self.old_price - self.price) / self.old_price * 100
 
     def get_products_by_ids(product_ids):
-        return Product.objects.filter(id__in=product_ids)
+        return Product.objects.filter(pk__in=product_ids)
 
     def get_profit(self):
         return self.price - self.buying_price

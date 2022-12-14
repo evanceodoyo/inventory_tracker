@@ -33,3 +33,21 @@ def retailer_required(view_func):
             return redirect("login")
 
     return wrapper_func
+
+
+def retailer_or_supplier_required(view_func):
+    def wrapper_func(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            user = request.user
+            if (
+                user.is_superuser
+                or user.user_type == "RETAILER"
+                or user.user_type == "SUPPLIER"
+            ):
+                return view_func(request, *args, **kwargs)
+            else:
+                raise PermissionDenied
+        else:
+            return redirect("login")
+
+    return wrapper_func

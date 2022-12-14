@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core.paginator import PageNotAnInteger, EmptyPage, Paginator, InvalidPage
 from shop.models import Category, Order, OrderItem, Product, ProductSpecification
-from accounts.decorators import retailer_required
+from accounts.decorators import retailer_required, retailer_or_supplier_required
 from django.contrib import messages
 from accounts.models import Supplier
 from django.db import transaction
@@ -265,11 +265,19 @@ def place_purchase_order(request):
     return redirect("dashboard")
 
 
-@retailer_required
+@retailer_or_supplier_required
 def notifications(request):
-    notifications = Notification.objects.select_related("product").order_by(
+    context = {}
+    notifications = Notification.objects.select_related("product", "supplier").order_by(
         "-created", "-unread"
     )
+    try:
+        filtered_notifications = notifications.filter(
+            supplier=Supplier.objects.get(name=request.user)
+        )
+        context["filtered_notifications"] = filtered_notifications
+    except Supplier.DoesNotExist:
+        pass
     products = Product.objects.filter(notification_sent=False).order_by("quantity")[:15]
     suppliers = (
         ProductSupplier.objects.select_related("supplier")
@@ -290,10 +298,7 @@ def notifications(request):
             notification.delete()
             messages.info(request, "Notification deleted successfully.")
             return redirect("notifications")
-
-    return render(
-        request,
-        "notifications.html",
+    context.update(
         {
             "page_title": "Notifications",
             "notifications": notifications,
@@ -301,6 +306,7 @@ def notifications(request):
             "suppliers": suppliers,
         },
     )
+    return render(request, "notifications.html", context)
 
 
 def suppliers(request):
